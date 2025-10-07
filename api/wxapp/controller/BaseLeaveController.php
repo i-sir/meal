@@ -14,8 +14,8 @@ namespace api\wxapp\controller;
  *     "create_time"             =>"2025-06-11 10:54:52",
  *     "version"                 =>"1.0",
  *     "use"                     => new \api\wxapp\controller\BaseLeaveController();
- *     "test_environment"        =>"http://shop_template.ikun:9090/api/wxapp/base_leave/index",
- *     "official_environment"    =>"http://shop_template.com/api/wxapp/base_leave/index",
+ *     "test_environment"        =>"http://meal.ikun:9090/api/wxapp/base_leave/index",
+ *     "official_environment"    =>"http://xcxkf207.aubye.com/api/wxapp/base_leave/index",
  * )
  */
 
@@ -40,7 +40,7 @@ class BaseLeaveController extends AuthController
     /**
      * 默认接口
      * /api/wxapp/base_leave/index
-     * http://shop_template.com/api/wxapp/base_leave/index
+     * http://xcxkf207.aubye.com/api/wxapp/base_leave/index
      */
     public function index()
     {
@@ -123,8 +123,8 @@ class BaseLeaveController extends AuthController
      * )
      *
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/base_leave/find_leave_list
-     *   official_environment: http://shop_template.com/api/wxapp/base_leave/find_leave_list
+     *   test_environment: http://meal.ikun:9090/api/wxapp/base_leave/find_leave_list
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/base_leave/find_leave_list
      *   api:  /wxapp/base_leave/find_leave_list
      *   remark_name: 投诉建议 列表
      *
@@ -184,8 +184,8 @@ class BaseLeaveController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/base_leave/find_leave
-     *   official_environment: http://shop_template.com/api/wxapp/base_leave/find_leave
+     *   test_environment: http://meal.ikun:9090/api/wxapp/base_leave/find_leave
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/base_leave/find_leave
      *   api:  /wxapp/base_leave/find_leave
      *   remark_name: 投诉建议 详情
      *
@@ -301,8 +301,8 @@ class BaseLeaveController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/base_leave/add_leave
-     *   official_environment: http://shop_template.com/api/wxapp/base_leave/add_leave
+     *   test_environment: http://meal.ikun:9090/api/wxapp/base_leave/add_leave
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/base_leave/add_leave
      *   api:  /wxapp/base_leave/add_leave
      *   remark_name: 投诉建议 编辑&添加
      *
@@ -373,8 +373,8 @@ class BaseLeaveController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/base_leave/delete_leave
-     *   official_environment: http://shop_template.com/api/wxapp/base_leave/delete_leave
+     *   test_environment: http://meal.ikun:9090/api/wxapp/base_leave/delete_leave
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/base_leave/delete_leave
      *   api:  /wxapp/base_leave/delete_leave
      *   remark_name: 投诉建议 删除
      *

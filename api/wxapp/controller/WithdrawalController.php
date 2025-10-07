@@ -27,8 +27,8 @@ error_reporting(0);
  *     "create_time"             =>"2025-01-12 17:34:25",
  *     "version"                 =>"1.0",
  *     "use"                     => new \api\wxapp\controller\WithdrawalController();
- *     "test_environment"        =>"http://shop_template.ikun:9090/api/wxapp/withdrawal/index",
- *     "official_environment"    =>"http://shop_template.com/api/wxapp/withdrawal/index",
+ *     "test_environment"        =>"http://meal.ikun:9090/api/wxapp/withdrawal/index",
+ *     "official_environment"    =>"http://xcxkf207.aubye.com/api/wxapp/withdrawal/index",
  * )
  */
 
@@ -72,8 +72,8 @@ class WithdrawalController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/withdrawal/find_withdrawal_list
-     *   official_environment: http://shop_template.com/api/wxapp/withdrawal/find_withdrawal_list
+     *   test_environment: http://meal.ikun:9090/api/wxapp/withdrawal/find_withdrawal_list
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/withdrawal/find_withdrawal_list
      *   api: /wxapp/withdrawal/find_withdrawal_list
      *   remark_name: 提现记录查询
      *
@@ -237,8 +237,8 @@ class WithdrawalController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/withdrawal/add_withdrawal
-     *   official_environment: http://shop_template.com/api/wxapp/withdrawal/add_withdrawal
+     *   test_environment: http://meal.ikun:9090/api/wxapp/withdrawal/add_withdrawal
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/withdrawal/add_withdrawal
      *   api: /wxapp/withdrawal/add_withdrawal
      *   remark_name: 提交提现申请
      *
@@ -363,8 +363,8 @@ class WithdrawalController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/withdrawal/api_notify
-     *   official_environment: http://shop_template.com/api/wxapp/withdrawal/api_notify
+     *   test_environment: http://meal.ikun:9090/api/wxapp/withdrawal/api_notify
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/withdrawal/api_notify
      *   api: /wxapp/withdrawal/api_notify
      *   remark_name: 微信转账回调 (接口回调,h5端)
      *

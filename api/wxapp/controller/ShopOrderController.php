@@ -13,8 +13,8 @@ namespace api\wxapp\controller;
  *     "create_time"             =>"2023-05-20 10:22:00",
  *     "version"                 =>"1.0",
  *     "use"                     => new \api\wxapp\controller\ShopOrderController();
- *     "test_environment"        =>"http://shop_template.ikun:9090/api/wxapp/shop_order/index",
- *     "official_environment"    =>"http://shop_template.com/api/wxapp/shop_order/index",
+ *     "test_environment"        =>"http://meal.ikun:9090/api/wxapp/shop_order/index",
+ *     "official_environment"    =>"http://xcxkf207.aubye.com/api/wxapp/shop_order/index",
  * )
  */
 
@@ -41,7 +41,7 @@ class ShopOrderController extends AuthController
     /**
      * 默认接口
      *  /wxapp/shop_order/index
-     * http://shop_template.com/api/wxapp/shop_order/index
+     * http://xcxkf207.aubye.com/api/wxapp/shop_order/index
      * api: /wxapp/shop_order/index
      *
      */
@@ -114,8 +114,8 @@ class ShopOrderController extends AuthController
      * )
      *
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/find_order_list
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/find_order_list
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/find_order_list
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/find_order_list
      *   api: /wxapp/shop_order/find_order_list
      *
      *
@@ -193,8 +193,8 @@ class ShopOrderController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/find_order
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/find_order
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/find_order
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/find_order
      *   api: /wxapp/shop_order/find_order
      *
      */
@@ -335,8 +335,8 @@ class ShopOrderController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/get_amount
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/get_amount
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/get_amount
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/get_amount
      *   api: /wxapp/shop_order/get_amount
      *   remark_name: 计算价格
      *
@@ -630,8 +630,8 @@ class ShopOrderController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/add_order
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/add_order
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/add_order
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/add_order
      *   api: /wxapp/shop_order/add_order
      *   remark_name: 下单
      *
@@ -921,8 +921,8 @@ class ShopOrderController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/cancel_order
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/cancel_order
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/cancel_order
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/cancel_order
      *   api: /wxapp/shop_order/cancel_order
      *   remark_name: 取消订单
      *
@@ -1057,8 +1057,8 @@ class ShopOrderController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/take_order
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/take_order
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/take_order
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/take_order
      *   api: /wxapp/shop_order/take_order
      *   remark_name: 确定收货 (确认完成)
      *
@@ -1144,8 +1144,8 @@ class ShopOrderController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/refund_order
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/refund_order
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/refund_order
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/refund_order
      *   api: /wxapp/shop_order/refund_order
      *   remark_name: 申请退款
      *
@@ -1275,8 +1275,8 @@ class ShopOrderController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/comment_order
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/comment_order
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/comment_order
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/comment_order
      *   api: /wxapp/shop_order/comment_order
      *   remark_name: 评论订单
      *
@@ -1382,8 +1382,8 @@ class ShopOrderController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/delete_order
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/delete_order
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/delete_order
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/delete_order
      *   api: /wxapp/shop_order/delete_order
      *   remark_name: 删除
      *
@@ -1450,8 +1450,8 @@ class ShopOrderController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_order/kdi
-     *   official_environment: http://shop_template.com/api/wxapp/shop_order/kdi?no=
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_order/kdi
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_order/kdi?no=
      *   api: /wxapp/shop_order/kdi
      *   remark_name: 查快递
      *

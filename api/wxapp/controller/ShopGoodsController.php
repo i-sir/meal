@@ -14,8 +14,8 @@ namespace api\wxapp\controller;
  *     "create_time"             =>"2025-06-04 11:00:27",
  *     "version"                 =>"1.0",
  *     "use"                     => new \api\wxapp\controller\ShopGoodsController();
- *     "test_environment"        =>"http://shop_template.ikun:9090/api/wxapp/shop_goods/index",
- *     "official_environment"    =>"http://shop_template.com/api/wxapp/shop_goods/index",
+ *     "test_environment"        =>"http://meal.ikun:9090/api/wxapp/shop_goods/index",
+ *     "official_environment"    =>"http://xcxkf207.aubye.com/api/wxapp/shop_goods/index",
  * )
  */
 
@@ -40,7 +40,7 @@ class ShopGoodsController extends AuthController
     /**
      * 默认接口
      * /api/wxapp/shop_goods/index
-     * http://shop_template.com/api/wxapp/shop_goods/index
+     * http://xcxkf207.aubye.com/api/wxapp/shop_goods/index
      */
     public function index()
     {
@@ -142,8 +142,8 @@ class ShopGoodsController extends AuthController
      * )
      *
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_goods/find_class_list
-     *   official_environment: http://shop_template.com/api/wxapp/shop_goods/find_class_list
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_goods/find_class_list
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_goods/find_class_list
      *   api:  /wxapp/shop_goods/find_class_list
      *   remark_name: 商品分类 列表
      *
@@ -234,8 +234,8 @@ class ShopGoodsController extends AuthController
      * )
      *
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_goods/find_class_plug_list
-     *   official_environment: http://shop_template.com/api/wxapp/shop_goods/find_class_plug_list
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_goods/find_class_plug_list
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_goods/find_class_plug_list
      *   api:  /wxapp/shop_goods/find_class_plug_list
      *   remark_name: 插件数据类型 列表
      *
@@ -397,8 +397,8 @@ class ShopGoodsController extends AuthController
      * )
      *
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_goods/find_goods_list
-     *   official_environment: http://shop_template.com/api/wxapp/shop_goods/find_goods_list
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_goods/find_goods_list
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_goods/find_goods_list
      *   api:  /wxapp/shop_goods/find_goods_list
      *   remark_name: 商品管理 列表
      *
@@ -477,8 +477,8 @@ class ShopGoodsController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_goods/find_goods
-     *   official_environment: http://shop_template.com/api/wxapp/shop_goods/find_goods?id=28
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_goods/find_goods
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_goods/find_goods?id=28
      *   api:  /wxapp/shop_goods/find_goods
      *   remark_name: 商品管理 详情
      *
@@ -535,8 +535,8 @@ class ShopGoodsController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_goods/find_goods_comment
-     *   official_environment: http://shop_template.com/api/wxapp/shop_goods/find_goods_comment?goods_id=28
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_goods/find_goods_comment
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_goods/find_goods_comment?goods_id=28
      *   api:  /wxapp/shop_goods/find_goods_comment
      *   remark_name: 商品评价 列表
      *

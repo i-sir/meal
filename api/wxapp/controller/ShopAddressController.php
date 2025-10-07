@@ -13,8 +13,8 @@ namespace api\wxapp\controller;
  *     "create_time"             =>"2023-12-16 11:34:00",
  *     "version"                 =>"1.0",
  *     "use"                     => new \api\wxapp\controller\ShopAddressController();
- *     "test_environment"        =>"http://shop_template.ikun:9090/api/wxapp/shop_address/index",
- *     "official_environment"    =>"http://shop_template.com/api/wxapp/shop_address/index",
+ *     "test_environment"        =>"http://meal.ikun:9090/api/wxapp/shop_address/index",
+ *     "official_environment"    =>"http://xcxkf207.aubye.com/api/wxapp/shop_address/index",
  * )
  */
 
@@ -42,7 +42,7 @@ class ShopAddressController extends AuthController
     /**
      * 默认接口
      * /api/wxapp/shop_address/index
-     * http://shop_template.com/api/wxapp/shop_address/index
+     * http://xcxkf207.aubye.com/api/wxapp/shop_address/index
      */
     public function index()
     {
@@ -76,8 +76,8 @@ class ShopAddressController extends AuthController
      * )
      *
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_address/find_address_list
-     *   official_environment: http://shop_template.com/api/wxapp/shop_address/find_address_list
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_address/find_address_list
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_address/find_address_list
      *   api:  /wxapp/shop_address/find_address_list
      *   remark_name: 地址列表
      *
@@ -140,8 +140,8 @@ class ShopAddressController extends AuthController
      * )
      *
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_address/find_address
-     *   official_environment: http://shop_template.com/api/wxapp/shop_address/find_address
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_address/find_address
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_address/find_address
      *   api:  /wxapp/shop_address/find_address
      *   remark_name: 地址详情
      *
@@ -331,8 +331,8 @@ class ShopAddressController extends AuthController
      *     @OA\Response(response="default", description="An example resource")
      * )
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_address/edit_address
-     *   official_environment: http://shop_template.com/api/wxapp/shop_address/edit_address
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_address/edit_address
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_address/edit_address
      *   api:  /wxapp/shop_address/edit_address
      *   remark_name: 地址管理 编辑&添加&删除&默认
      *

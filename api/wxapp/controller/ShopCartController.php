@@ -14,8 +14,8 @@ namespace api\wxapp\controller;
  *     "create_time"             =>"2024-05-05 11:25:08",
  *     "version"                 =>"1.0",
  *     "use"                     => new \api\wxapp\controller\SchoolCartController();
- *     "test_environment"        =>"http://shop_template.ikun:9090/api/wxapp/shop_cart/index",
- *     "official_environment"    =>"http://shop_template.com/api/wxapp/shop_cart/index",
+ *     "test_environment"        =>"http://meal.ikun:9090/api/wxapp/shop_cart/index",
+ *     "official_environment"    =>"http://xcxkf207.aubye.com/api/wxapp/shop_cart/index",
  * )
  */
 
@@ -41,7 +41,7 @@ class ShopCartController extends AuthController
     /**
      * 默认接口
      * /api/wxapp/shop_cart/index
-     * http://shop_template.com/api/wxapp/shop_cart/index
+     * http://xcxkf207.aubye.com/api/wxapp/shop_cart/index
      */
     public function index()
     {
@@ -150,8 +150,8 @@ class ShopCartController extends AuthController
      * )
      *
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_cart/edit_cart
-     *   official_environment: http://shop_template.com/api/wxapp/shop_cart/edit_cart
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_cart/edit_cart
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_cart/edit_cart
      *   api:  /wxapp/shop_cart/edit_cart
      *   remark_name: 编辑&删除 购物车
      *
@@ -252,8 +252,8 @@ class ShopCartController extends AuthController
      * )
      *
      *
-     *   test_environment: http://shop_template.ikun:9090/api/wxapp/shop_cart/find_cart_list
-     *   official_environment: http://shop_template.com/api/wxapp/shop_cart/find_cart_list
+     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_cart/find_cart_list
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_cart/find_cart_list
      *   api:  /wxapp/shop_cart/find_cart_list
      *   remark_name: 购物车列表
      *
