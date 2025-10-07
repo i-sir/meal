@@ -39,8 +39,9 @@ class ShopAddressInit extends Base
      */
     public function get_list($where = [], $order = 'id desc', $params = [], $is_admin = false)
     {
-        $ShopAddressModel = new \initmodel\ShopAddressModel(); //地址管理  (ps:InitModel)
-        $MemberModel      = new \initmodel\MemberModel();//(ps:InitModel)
+        $ShopAddressModel    = new \initmodel\ShopAddressModel(); //地址管理  (ps:InitModel)
+        $MemberModel         = new \initmodel\MemberModel();//(ps:InitModel)
+        $CompanyAddressModel = new \initmodel\CompanyAddressModel(); //公司地址列表   (ps:InitModel)
 
 
         $result = $ShopAddressModel
@@ -49,12 +50,15 @@ class ShopAddressInit extends Base
             ->field($this->listField)
             ->limit($params["limit"] ?? 10000)
             ->select()
-            ->each(function ($item, $key) use ($params, $is_admin, $MemberModel) {
+            ->each(function ($item, $key) use ($params, $is_admin, $CompanyAddressModel, $MemberModel) {
 
                 //处理数据
                 $item['is_default_text'] = $this->is_default[$item['is_default']];//是否默认
                 $item['status_text']     = $this->status[$item['status']];//状态
 
+
+                //公司名称
+                $item['company_name'] = $CompanyAddressModel->where('id', '=', $item['company_id'])->value('name');
 
                 if ($params["is_export"]) {
                     //导出数据处理
@@ -80,8 +84,9 @@ class ShopAddressInit extends Base
      */
     public function get_list_paginate($where = [], $order = "id desc", $params = [], $is_admin = false)
     {
-        $ShopAddressModel = new \initmodel\ShopAddressModel(); //地址管理  (ps:InitModel)
-        $MemberModel      = new \initmodel\MemberModel();//(ps:InitModel)
+        $ShopAddressModel    = new \initmodel\ShopAddressModel(); //地址管理  (ps:InitModel)
+        $MemberModel         = new \initmodel\MemberModel();//(ps:InitModel)
+        $CompanyAddressModel = new \initmodel\CompanyAddressModel(); //公司地址列表   (ps:InitModel)
 
 
         $result = $ShopAddressModel
@@ -89,8 +94,10 @@ class ShopAddressInit extends Base
             ->order($order)
             ->field($this->listField)
             ->paginate(["list_rows" => $params["page_size"] ?? 15, "query" => $params])
-            ->each(function ($item, $key) use ($params, $is_admin, $MemberModel) {
+            ->each(function ($item, $key) use ($params, $is_admin, $CompanyAddressModel, $MemberModel) {
 
+                //公司名称
+                $item['company_name'] = $CompanyAddressModel->where('id', '=', $item['company_id'])->value('name');
 
                 //处理数据
                 $item['is_default_text'] = $this->is_default[$item['is_default']];//是否默认
@@ -117,8 +124,9 @@ class ShopAddressInit extends Base
      */
     public function get_find($where = [], $params = [], $is_admin = false)
     {
-        $ShopAddressModel = new \initmodel\ShopAddressModel(); //地址管理  (ps:InitModel)
-        $MemberModel      = new \initmodel\MemberModel();//(ps:InitModel)
+        $ShopAddressModel    = new \initmodel\ShopAddressModel(); //地址管理  (ps:InitModel)
+        $MemberModel         = new \initmodel\MemberModel();//(ps:InitModel)
+        $CompanyAddressModel = new \initmodel\CompanyAddressModel(); //公司地址列表   (ps:InitModel)
 
 
         $item = $ShopAddressModel->where($where)->field($this->findField)->find();
@@ -128,6 +136,8 @@ class ShopAddressInit extends Base
 
         //公共处理数据
 
+        //公司名称
+        $item['company_name'] = $CompanyAddressModel->where('id', '=', $item['company_id'])->value('name');
 
         //处理数据
         $item['is_default_text'] = $this->is_default[$item['is_default']];//是否默认

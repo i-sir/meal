@@ -190,6 +190,17 @@ class ShopAddressController extends AuthController
      *     ),
      *
      *
+     *    @OA\Parameter(
+     *         name="company_id",
+     *         in="query",
+     *         description="公司id",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *         )
+     *     ),
+     *
+     *
      *
      *
      *

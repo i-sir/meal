@@ -1,0 +1,273 @@
+<!--名称-->
+<div class="form-group">
+    <label class="col-sm-2 control-label">名称:</label>
+    <div class="layui-input-block col-sm-6">
+        <input type="text" name="name" class="form-control post-params item-left" value="{$name|default=''}">
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">地址</label>
+    <div class="col-md-6 col-sm-10">
+        <div style="display: flex;">
+            <input class="form-control post-params item-left" id="address" name="address"
+                   onblur="searchAddress()"
+                   placeholder="请输入详细地址" required
+                   type="text" value="{$address}">
+            <a class="btn btn-primary" href="javascript:" onclick="searchAddress()"
+               style="margin-left: 10px;">搜索</a>
+        </div>
+        <div id="container" style="margin-top:10px;width:800px;height:400px;"></div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2 control-label">经纬度</label>
+    <input class="form-control post-params item-left" id="lng" name="lng" type="hidden" value="{$lng}">
+    <input class="form-control post-params item-left" id="lat" name="lat" type="hidden" value="{$lat}">
+    <div class="col-md-6 col-sm-10">
+        <input class="form-control post-params" id="lnglat" name="lnglat" placeholder="" readonly required
+               type="text"
+               value="{$lnglat}">
+    </div>
+</div>
+<!--
+控制器
+
+----- 插入处理数据方法 -----
+     edit_post方法:
+
+     //经纬度单独存
+     $lnglat        = explode(',', $params['lnglat']);
+     $params['lng'] = $lnglat[0];//经度
+     $params['lat'] = $lnglat[1];//纬度
+     //省市区基本信息
+     $province_info = Db::name('region')->where('code', '=', $params['province_code'])->find();
+     $city_info     = Db::name('region')->where('code', '=', $params['city_code'])->find();
+     $county_info   = Db::name('region')->where('code', '=', $params['county_code'])->find();
+     //name
+     $params['province'] = $province_info['name'];
+     $params['city']     = $city_info['name'];
+     $params['county']   = $county_info['name'];
+     //id
+     $params['province_id'] = $province_info['id'];
+     $params['city_id']     = $city_info['id'];
+     $params['county_id']   = $county_info['id'];
+
+
+    本控制器增加三个方法
+     public function getArea()
+    {
+        if (cache('admin_region_list')) {
+            $area = cache('admin_region_list');
+        } else {
+            $area = Db::name('region')->where('parent_id', '=', 10000000)->field('id,name,code')->select()->each(function ($item, $key) {
+                $item['cityList'] = Db::name("region")->where(['parent_id' => $item['id']])->field('id,name,code')->select()->each(function ($item1, $key) {
+                    $item1['areaList'] = Db::name("region")->where(['parent_id' => $item1['id']])->field('id,name,code')->select()->each(function ($item2, $key) {
+                        return $item2;
+                    });
+                    return $item1;
+                });
+                return $item;
+            });
+            cache("admin_region_list", $area);
+        }
+        $this->success('list', '', $area);
+    }
+
+
+
+
+    /**
+     * 地址转换为坐标(高德地图)
+     */
+    public function search_address_ii()
+    {
+        $address = $this->request->param('address');
+        $key     = "0f7cbfb881a2bea61d912a4cc920b663";
+
+        $url    = "https://restapi.amap.com/v3/geocode/geo?address={$address}&key={$key}";
+        $result = file_get_contents($url);
+        $result = json_decode($result, true);
+        if ($result['status'] == 1) {
+
+            $geocodes = $result['geocodes'];
+            $return   = [];
+            foreach ($geocodes as $item) {
+                $location = explode(',', $item['location']);
+                $return[] = ['lon' => $location[0], 'lat' => $location[1]];
+            }
+            $this->success('', '', $return);
+        } else {
+            $this->success('', '', $result['info']);
+        }
+    }
+
+    /**
+     * 坐标转换地址(高德地图)
+     */
+    public function reverse_address_ii()
+    {
+        $lng = $this->request->param('lng');
+        $lat = $this->request->param('lat');
+        $key = "0f7cbfb881a2bea61d912a4cc920b663";
+        $url = "https://restapi.amap.com/v3/geocode/regeo?location={$lng},{$lat}&key={$key}";
+
+        $result = file_get_contents($url);
+        $result = json_decode($result, true);
+        if ($result['status'] == 1) {
+
+            $regeocode         = $result['regeocode'];
+            $formatted_address = $regeocode['formatted_address'];
+            $this->success('', '', $formatted_address);
+        } else {
+            $this->success('', '', $result['info']);
+        }
+    }
+
+
+
+    计算距离
+    $field_lat = 'lat';// 数据库字段名 - 纬度  -90°到90°
+    $field_lng = 'lng';// 数据库字段名 - 经度  -180°到180°
+    $lat       = $params['lat'];// 数据库字段名 - 纬度  -90°到90°
+    $lng       = $params['lng'];// 数据库字段名 - 经度  -180°到180°
+    if (!empty($lat) && !empty($lng)) {
+        $field           = "*, (6378.138 * 2 * asin(sqrt(pow(sin(({$field_lng} * pi() / 180 - {$lng} * pi() / 180) / 2),2) + cos({$field_lng} * pi() / 180) * cos({$lng} * pi() / 180) * pow(sin(({$field_lat} * pi() / 180 - {$lat} * pi() / 180) / 2),2))) * 1000) as distance";
+        $params['order'] = 'distance asc,id desc';
+        $params['field'] = $field;
+
+
+        //方法2 规定距离范围
+        // ->field("*")
+        //            ->field("{$distanceFormula} as distance")
+        //            ->having("distance BETWEEN 10000 AND 20000")
+        //            ->order('distance')
+        //            ->select();
+    }
+
+    //$item['distance']  = '0km';
+    if ($item['distance']) $item['distance'] = round($item['distance'] / 100, 2) . 'km';
+ -->
+<!--高德地图板块-->
+<script src="https://webapi.amap.com/maps?v=1.4.15&key=0f7cbfb881a2bea61d912a4cc920b663"></script>
+<script>
+
+    //定义地图中心点坐标
+    var already_lat = $("#lat").val();
+    var already_lng = $("#lng").val();
+
+    if (already_lat == '') {
+        already_lat = 39.916706;
+        already_lng = 116.403119;
+    }
+
+    var map = new AMap.Map('container', {
+        center: [already_lng, already_lat],
+        zoom: 16
+    });
+
+    var marker;
+    //设置圆形位置
+    // var center = new AMap.LngLat(already_lng, already_lat);
+    //设置圆的半径大小
+    // var radius = $("#delivery_distance").val() //单位:px
+    // radius = radius * 1000
+
+    //创建圆形 Circle 实例
+    // var circle = new AMap.Circle({
+    //     center: center, //圆心
+    //     radius: radius, //半径
+    //     borderWeight: 3, //描边的宽度
+    //     strokeColor: "", //轮廓线颜色
+    //     strokeOpacity: 1, //轮廓线透明度
+    //     strokeWeight: 6, //轮廓线宽度
+    //     fillOpacity: 0.4, //圆形填充透明度
+    //     strokeStyle: "dashed", //轮廓线样式
+    //     strokeDasharray: [10, 10],
+    //     fillColor: "#1791fc", //圆形填充颜色
+    //     zIndex: 50, //圆形的叠加顺序
+    // });
+
+    //圆形 Circle 对象添加到 Map
+    //map.add(circle);//不需要画圆
+    //根据覆盖物范围调整视野
+    //map.setFitView([circle]);//这里也不需要覆盖
+
+
+    map.on('click', function (e) {
+        // console.log(e)
+        // console.log('cccccccccccc')
+        var lng = e.lnglat.lng
+        var lat = e.lnglat.lat
+
+        let url = "{:url('reverse_address_ii')}";
+        $.get(url, {lng: lng, lat: lat}, function (res) {
+            // debugger;
+            //console.log(res)
+            if (res.code == 1) {
+                let address = res.data;
+                $("#lnglat").val(lng + "," + lat);
+                $("#address").val(address);
+                addMarker(lng, lat);
+            } else {
+                layer.msg(res.msg);
+            }
+        });
+
+    });
+
+    addMarker(already_lng, already_lat)
+
+    function searchAddress() {
+        var province_code = $("#province_code option:selected").text();
+        var city_code = $("#city_code option:selected").text();
+        var district = $("#county_code option:selected").text();
+
+        // if(province_code == '请选择'){
+        //     layer.msg('请选择地区');
+        //     return;
+        // }
+        // if(city_code == '请选择' || district == '请选择'){
+        //     layer.msg('请选择地区');
+        //     return;
+        // }
+        let address = $("#address").val();
+        var full_address = province_code + city_code + district + address;//可以根据具体位置直接搜索
+        let url = "{:url('search_address_ii')}";
+        $.get(url, {address: full_address}, function (res) {
+            // debugger;
+            if (res.code == 1) {
+                let location = res.data;
+                console.log(location)
+                $("#lnglat").val(location[0].lon + "," + location[0].lat);
+                addMarker(location[0].lon, location[0].lat);//画图标
+            } else {
+                layer.msg(res.msg);
+            }
+        });
+    }
+
+    function addMarker(lng, lat) {
+        console.log(11)
+        clearMarker();
+        var position = new AMap.LngLat(lng, lat);
+
+        map.setCenter([lng, lat])
+        marker = new AMap.Marker({
+            //icon: "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png",
+            position: position,
+        });
+        map.add(marker);
+    }
+
+    //移除marker事件
+    function clearMarker() {
+        if (marker) {
+            marker.setMap(null);
+            marker = null;
+        }
+    }
+</script>
+
+
+
