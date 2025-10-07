@@ -1,0 +1,58 @@
+<div class="form-group">
+    <div class="layui-form-item">
+        <label class="col-sm-2 control-label">其他信息:</label>
+        <div class="col-md-6 col-sm-10" id="other_value00002" style="">
+            <if condition="!empty($other)">
+                <foreach item="val" key="key" name="$other">
+                    <div>
+                        <div class="layui-inline">
+                            <input class="form-control post-params" name="other_key[{$key}]" placeholder="属性名称"
+                                   type="text"
+                                   value="{$val.key}"
+                            <if condition="$val.is_readonly">readonly</if>
+                            >
+                        </div>
+                        <div class="layui-inline">
+                            <input class="form-control post-params" name="other_value[{$key}]" placeholder="属性值"
+                                   type="text"
+                                   value="{$val.value}"
+                            <if condition="$val.is_required">required</if>
+                            >
+                        </div>
+
+                        <input name="other_is_delete[]" type="hidden" value="{$val.is_delete}">
+                        <input name="other_is_readonly[]" type="hidden" value="{$val.is_readonly}">
+                        <input name="other_is_required[]" type="hidden" value="{$val.is_required}">
+
+                        <if condition="$val.is_delete">
+                            <div class="layui-inline">
+                                <button class="layui-btn layui-btn-danger layui-btn-sm removeclass"
+                                        type="button">
+                                    <i class="layui-icon">&#xe67e;</i></button>
+                            </div>
+                        </if>
+                    </div>
+                </foreach>
+            </if>
+
+            <div>
+                <div class="layui-inline">
+                    <input class="form-control post-params" name="other_key[]" placeholder="属性名称" type="text">
+                </div>
+                <div class="layui-inline">
+                    <input class="form-control post-params" name="other_value[]" placeholder="属性值" type="text">
+                </div>
+                <input name="other_is_delete[]" type="hidden" value="1">
+                <input name="other_is_readonly[]" type="hidden" value="0">
+                <input name="other_is_required[]" type="hidden" value="0">
+
+                <div class="layui-inline">
+                    <button class="layui-btn layui-btn-warm layui-btn-sm" id="button_other_value00002"
+                            type="button">
+                        <i class="layui-icon">&#xe654; </i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

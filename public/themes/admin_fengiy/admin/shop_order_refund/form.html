@@ -1,0 +1,410 @@
+
+
+
+
+    <!--用户-->    <div class="form-group">
+        <label class="col-sm-2 control-label">用户信息:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="user_id" class="form-control post-params item-left" value="{$user_id|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--售后类型:1退货退款,2换货-->    <div class="form-group">
+        <label class="col-sm-2 control-label">售后类型:</label>
+        <div class="layui-input-block col-sm-6">
+                                <if condition="!empty($type)">
+    <select class="form-control post-params" lay-search lay-filter="type" name="type">
+        <foreach item="vo" key="key" name="type_list">
+            <option value="{$key}"
+            <if condition="$type eq $key ">selected</if>
+            >{$vo}</option>
+        </foreach>
+    </select>
+    <else/>
+    <select class="form-control post-params" lay-search lay-filter="type" name="type">
+        <foreach item="vo" key="key" name="type_list">
+            <option value="{$key}">{$vo}</option>
+        </foreach>
+    </select>
+</if>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--换货原因-->    <div class="form-group">
+        <label class="col-sm-2 control-label">换货原因:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="refund_why" class="form-control post-params item-left" value="{$refund_why|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--退款订单号-->    <div class="form-group">
+        <label class="col-sm-2 control-label">退款订单号:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="order_num" class="form-control post-params item-left" value="{$order_num|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--详情id-->    <div class="form-group">
+        <label class="col-sm-2 control-label">详情id:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="detail_id" class="form-control post-params item-left" value="{$detail_id|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--退款金额-->    <div class="form-group">
+        <label class="col-sm-2 control-label">退款金额:</label>
+        <div class="layui-input-block col-sm-6">
+                                <input type="number" class="form-control post-params item-left" name="amount" value="{$amount|default=''}">
+                        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--退货数量-->    <div class="form-group">
+        <label class="col-sm-2 control-label">退货数量:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="count" class="form-control post-params item-left" value="{$count|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--状态:1售后中, 2售后完成,3已拒绝,4已取消-->    <div class="form-group">
+        <label class="col-sm-2 control-label">状态:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="status" class="form-control post-params item-left" value="{$status|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--拒绝理由-->    <div class="form-group">
+        <label class="col-sm-2 control-label">拒绝理由:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="refuse" class="form-control post-params item-left" value="{$refuse|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--退款订单号-->    <div class="form-group">
+        <label class="col-sm-2 control-label">退款订单号:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="refund_num" class="form-control post-params item-left" value="{$refund_num|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--说明-->    <div class="form-group">
+        <label class="col-sm-2 control-label">说明:</label>
+        <div class="layui-input-block col-sm-6">
+                                <script type="text/plain" id="content" name="content">{:cmf_replace_content_file_url(htmlspecialchars_decode($content))}</script>
+                    <script type="text/javascript">
+                        //编辑器路径定义
+                        var editorURL = GV.WEB_ROOT;
+                    </script>
+                    <script type="text/javascript" src="/static/js/ueditor/ueditor.config.js?v=00001"></script>
+                    <script type="text/javascript" src="/static/js/ueditor/ueditor.all.min.js"></script>
+                    <!--编辑器支持秀米-->
+                    <script type="text/javascript" src="/static/js/ueditor/xiumi/xiumi-ue-dialog-v5.js"></script>
+                    <link rel="stylesheet" type="text/css" href="/static/js/ueditor/xiumi/xiumi-ue-v5.css" />
+                    <script type="text/javascript">
+                        $(function () {
+                            editorcontent = new baidu.editor.ui.Editor();
+                            editorcontent.render('content');
+                            try {
+                                editorcontent.sync();
+                            } catch (err) {
+                            }
+                        });
+                    </script>
+                        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--图集-->    <div class="form-group">
+        <label class="col-sm-2 control-label">图集:</label>
+        <div class="layui-input-block col-sm-6">
+                                <div class="help-block text-danger">长按图片可上下拖动,调整图片顺序</div>
+<if condition="!empty($images)">
+<ul id="imagesId000000012" class="pic-list list-unstyled form-inline">
+<foreach name="$images" item="vo">
+<li id="savedImages-000000012-{$key}" style="margin-bottom: 5px;">
+<input id="photoImages-000000012-{$key}" type="hidden" name="images[{$key}]" value="{$vo}">
+<img id="photoImages-000000012-{$key}-preview" src="{:cmf_get_image_preview_url($vo)}" height="50" onclick="parent.imagePreviewDialog(this.src);">
+<a href="javascript:uploadOneImage('图片上传','#photoImages-000000012-{$key}');">替换</a>
+<a href="javascript:(function(){$('#savedImages-000000012-{$key}').remove();})();">移除</a>
+</li>
+</foreach>
+</ul>
+<else/>
+<ul id="imagesId000000012" class="pic-list list-unstyled form-inline">
+<li id="savedImages-000000012" style="margin-bottom: 5px;">
+</li>
+</ul>
+</if>
+<a href="javascript:uploadMultiImage('图片上传','#imagesId000000012','itemImages-000000012');" class="btn btn-sm btn-default">选择图片</a>
+<script type="text/html" id="itemImages-000000012">
+<li id="savedImages-000000012-{id}" style="margin-bottom: 5px;">
+<input id="photoImages-000000012-{id}" type="hidden" name="images[{id}]" value="{filepath}">
+<img id="photoImages-000000012-{id}-preview" src="{url}" height="50" onclick="imagePreviewDialog(this.src);">
+<a href="javascript:uploadOneImage('图片上传','#photoImages-000000012-{id}');">替换</a>
+<a href="javascript:(function(){$('#savedImages-000000012-{id}').remove();})();">移除</a>
+</li>
+</script>
+<script>
+// 多图上传支持排序
+new Sortable(imagesId000000012, {
+animation: 150,
+ghostClass: 'blue-background-class'
+});
+</script>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--拒绝时间-->    <div class="form-group">
+        <label class="col-sm-2 control-label">拒绝时间:</label>
+        <div class="layui-input-block col-sm-6">
+                                                    <input class="form-control post-params item-left js-datetime" name="refuse_time" required
+                           type="text"
+                           value="{:isset($refuse_time) && $refuse_time > 10000 ? date('Y-m-d H:i', $refuse_time) : ''}">
+         </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--商品-->    <div class="form-group">
+        <label class="col-sm-2 control-label">商品:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="goods_id" class="form-control post-params item-left" value="{$goods_id|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--商品名字-->    <div class="form-group">
+        <label class="col-sm-2 control-label">商品名字:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="goods_name" class="form-control post-params item-left" value="{$goods_name|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--更换规格id-->    <div class="form-group">
+        <label class="col-sm-2 control-label">更换规格id:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="sku_id" class="form-control post-params item-left" value="{$sku_id|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--更换规格-->    <div class="form-group">
+        <label class="col-sm-2 control-label">更换规格:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="sku_name" class="form-control post-params item-left" value="{$sku_name|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--价格/单价-->    <div class="form-group">
+        <label class="col-sm-2 control-label">价格/单价:</label>
+        <div class="layui-input-block col-sm-6">
+                                <input type="number" class="form-control post-params item-left" name="goods_price" value="{$goods_price|default=''}">
+                        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--快递单号-->    <div class="form-group">
+        <label class="col-sm-2 control-label">快递单号:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="exp_num" class="form-control post-params item-left" value="{$exp_num|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <!--快递名称-->    <div class="form-group">
+        <label class="col-sm-2 control-label">快递名称:</label>
+        <div class="layui-input-block col-sm-6">
+                            <input type="text" name="exp_name" class="form-control post-params item-left" value="{$exp_name|default=''}">
+                    </div>
+    </div>
+
+
+
+
+
+
+
+
+

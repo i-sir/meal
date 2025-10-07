@@ -1,0 +1,27 @@
+<include file="public@header"/></head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li><a href="{:url('index',['page'=>$page,'pid'=>$pid,'type'=>'goods','params'=>$params])}">商品管理</a></li>
+        <li class="active"><a href="{:url('add',['page'=>$page,'pid'=>$pid,'type'=>'goods','params'=>$params])}">添加</a>
+        </li>
+        <!--<li><a  href="/edit.html" >ADMIN_NAV_EDIT</a></li>-->
+    </ul>
+    <form method="post" class="form-horizontal js-ajax-form margin-top-20 layui-form" autocomplete="off"
+          action="{:url('edit_post',['page'=>$page,'pid'=>$pid,'type'=>'goods','params'=>$params])}">
+
+        <include file="shop_goods/form"/>
+
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary" lay-submit lay-filter="submit">
+                保存
+            </button>
+            <a class="layui-btn layui-btn-primary" href="javascript:history.back(-1);">返回</a>
+        </div>
+    </form>
+
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+</body>
+</html>
+

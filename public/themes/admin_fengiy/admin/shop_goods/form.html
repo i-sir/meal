@@ -1,0 +1,457 @@
+<style>
+    .layui-btn .layui-icon {
+        vertical-align: middle !important;
+    }
+</style>
+
+
+<!--商品类型:商品类型:goods=普通商品,customized=定制商品-->
+<input type="hidden" name="type" class="form-control post-params item-left"
+       value="goods">
+
+<!--分类-->
+<div class="form-group">
+    <div class="layui-form-item">
+        <label class="col-sm-2 control-label">分类:</label>
+        <div class="col-md-6 col-sm-10">
+            <div class="layui-inline">
+                <if condition="!empty($class_id)">
+                    <select class="form-control post-params one" lay-filter="one" lay-search name="class_id">
+                        <option value="">请选择</option>
+                        <foreach item="vo" key="key" name="class_list">
+                            <option value="{$vo.id}"
+                            <if condition="$class_id eq $vo.id ">selected</if>
+                            >{$vo.name}</option>
+                        </foreach>
+                    </select>
+                    <else/>
+                    <select class="form-control post-params" lay-filter="one" lay-search name="class_id">
+                        <option value="">请选择</option>
+                        <foreach item="vo" key="key" name="class_list">
+                            <option value="{$vo.id}">{$vo.name}</option>
+                        </foreach>
+                    </select>
+                </if>
+            </div>
+            <!--下拉框4.0   三级联动多选框  二级框-->
+            <div class="layui-inline">
+                <select class="form-control post-params two" lay-filter="two" lay-search name="class_two_id">
+                </select>
+            </div>
+        </div>
+        <!--编辑获取id值-->
+        <input id="item_id" type="hidden" value="{$id}">
+    </div>
+
+    <script>
+        /**
+         * 后台控制 添加方法
+
+         //获取一级二级列表
+         public function get_class_list()
+         {
+       $params = $this->request->param();
+        //用户
+        $ShopGoodsModel      = new \initmodel\ShopGoodsModel(); //商品管理   (ps:InitModel)
+        $ShopGoodsClassModel = new \initmodel\ShopGoodsClassModel(); //分类管理   (ps:InitModel)
+
+        //查询二级,三级分类条件.
+        $map = [];
+        if ($params['one_id']) $map[] = ['pid', '=', $params['one_id']];//查询二级列表
+        if ($params['two_id']) $map[] = ['pid', '=', $params['two_id']];//查询三级列表
+        if (empty(count($map))) $this->success('请求成功');
+
+        //二级列表
+        $two_list = $ShopGoodsClassModel->where($map)->order('id desc')->select();
+        //查询数据,方便展示二级下拉框选中值
+        if ($params['item_id']) {
+            $item_info = $ShopGoodsModel->where(['id' => $params['item_id']])->find();
+            if ($item_info) {
+                foreach ($two_list as $k => &$v) {
+                    $v['selected'] = false;
+                    //这里的branch_id 更改为二级,三级id
+                    if ($params['one_id'] && $item_info['class_two_id'] == $v['id']) $v['selected'] = 'selected';//选中
+                    //if ($params['two_id'] && $item_info['class_three_id'] == $v['id']) $v['selected'] = 'selected';//选中
+                }
+            }
+        }
+        $this->success('请求成功', '', $two_list);
+   }
+
+
+
+         //find展示代码
+         $one_info        = $ClassModel->where('id', '=', $item['class_id'])->find();
+         $two_info = $ClassModel->where('id', '=', $item['class_two_id'])->find();
+         if ($one_info) $item['class_name'] = $one_info['name'];
+         if ($two_info) $item['class_name'] = $two_info['name'];
+         if ($two_info && $one_info) $item['class_name'] = $one_info['name'] . ' - ' . $two_info['name'];
+
+
+         //edit代码
+         if ($params['class_id']) $params['search_class_id'] = $params['class_id'];
+         if ($params['class_two_id']) $params['search_class_id'] = $params['class_two_id'];
+
+         *
+         **/
+
+        layui.use(['form', 'element'], function () {
+            var form = layui.form,
+                element = layui.element;
+
+            //获取默认值
+            var one = $(".one").val();//一级值
+            var item_id = $("#item_id").val();
+
+            //读取二级值
+            $.ajax({
+                url: "{:url('get_class_list')}",
+                type: "GET",
+                data: {
+                    'one_id': one,//获取子级分类
+                    'item_id': item_id,
+                },
+                async: false,
+                success: function (res) {
+                    if (res.code == 1) {
+                        List = res.data;
+                        tmp_option = '<option value=""  >' + '请选择' + '</option>';
+                        tmp = '';
+                        tmp += '<option value=""  >' + '请选择' + '</option>';
+                        for (var i in List) {
+                            tmp += '<option value="' + List[i].id + '"  ' + List[i].selected + '>' + List[i].name + '</option>';
+                        }
+                        $(".two").html(tmp);
+                        $(".three").html(tmp_option);//初始第三级
+                    }
+                    form.render();
+                }
+            });
+
+
+            var two = $(".two").val();//二级值
+            //读取三级值
+            $.ajax({
+                url: "{:url('get_class_list')}",
+                type: "GET",
+                data: {
+                    'two_id': two,//获取子级分类
+                    'item_id': item_id,
+                },
+                async: false,
+                success: function (res) {
+                    if (res.code == 1) {
+                        List = res.data;
+                        tmp = '';
+                        tmp += '<option value=""  >' + '请选择' + '</option>';
+                        for (var i in List) {
+                            tmp += '<option value="' + List[i].id + '"  ' + List[i].selected + '>' + List[i].name + '</option>';
+                        }
+                        $(".three").html(tmp);
+                    }
+                    form.render();
+                }
+            });
+
+
+            //选中一级下拉框,展示二级下拉框
+            form.on('select(one)', function (data) {
+                // console.log(data.elem); //得到select原始DOM对象
+                // console.log(data.value); //得到被选中的值
+
+
+                //一级为空,初始化二级下拉框
+                if (!data.value) {
+                    tmp_option = '<option value=""  >' + '请选择' + '</option>';
+                    $(".two").html(tmp_option);
+                    form.render();
+
+                    return false;
+                }
+
+
+                $.ajax({
+                    url: "{:url('get_class_list')}",
+                    type: "GET",
+                    data: {
+                        'one_id': data.value
+                    },
+                    async: false,
+                    success: function (res) {
+                        if (res.code == 1) {
+                            List = res.data;
+                            tmp_option = '<option value=""  >' + '请选择' + '</option>';
+                            tmp = '';
+                            tmp += '<option value=""  >' + '请选择' + '</option>';
+                            for (var i in List) {
+                                tmp += '<option value="' + List[i].id + '"  ' + List[i].selected + '>' + List[i].name + '</option>';
+                            }
+                            $(".two").html(tmp);
+                            $(".three").html(tmp_option);//初始第三级
+                        }
+                        form.render();
+                    }
+                });
+            });
+
+
+        });
+    </script>
+
+</div>
+
+<!--商品名称-->
+<div class="form-group">
+    <label class="col-sm-2 control-label">商品名称:</label>
+    <div class="layui-input-block col-sm-6">
+        <input type="text" name="goods_name" class="form-control post-params item-left"
+               value="{$goods_name|default=''}">
+    </div>
+</div>
+
+
+<!--标签-->
+<div class="form-group">
+    <label class="col-sm-2 control-label">标签:</label>
+    <div class="layui-input-block col-sm-6">
+        <input type="text" name="tag" class="form-control post-params item-left" value="{$tag|default=''}">
+        <p class="help-block text-danger">使用/隔开最多三个</p>
+    </div>
+</div>
+
+
+
+
+<!-- 规格类型 -->
+<div id="fairy-is-attribute"></div>
+<!--商品规格表-->
+<div id="fairy-spec-table"></div>
+<!--商品库存表-->
+<div id="fairy-sku-table"></div>
+
+
+<!--封面-->
+<div class="form-group">
+    <label class="col-sm-2 control-label">封面:</label>
+    <div class="layui-input-block col-sm-6">
+        <input type="hidden" class="form-control post-params item-left" name="image" id="photo-0000009"
+               value="{$image}">
+        <if condition='!empty($image)'>
+            <a href="javascript:imagePreviewDialog('{:cmf_get_asset_url($image)}');">
+                <img src='{:cmf_get_image_preview_url($image)}' id='photo-0000009-preview' style='width: 85px;'>
+            </a>
+            <else/>
+            <img src='/static/images/default.png' id='photo-0000009-preview' style='width: 85px;'>
+        </if>
+        <a href="javascript:uploadOneImage('图片上传','#photo-0000009','image');">上传</a>
+        <a onclick="$('#photo-0000009-preview').attr('src','__TMPL__/public/assets/images/default-thumbnail.png');$('#photo-0000009').val('');return false;">取消图片</a>
+    </div>
+</div>
+
+
+<!--图集-->
+<div class="form-group">
+    <label class="col-sm-2 control-label">图集:</label>
+    <div class="layui-input-block col-sm-6">
+        <div class="help-block text-danger">长按图片可上下拖动,调整图片顺序</div>
+        <if condition="!empty($images)">
+            <ul id="imagesId000000010" class="pic-list list-unstyled form-inline">
+                <foreach name="$images" item="vo">
+                    <li id="savedImages-000000010-{$key}" style="margin-bottom: 5px;">
+                        <input id="photoImages-000000010-{$key}" type="hidden" name="images[{$key}]" value="{$vo}">
+                        <img id="photoImages-000000010-{$key}-preview" src="{:cmf_get_image_preview_url($vo)}"
+                             height="50" onclick="parent.imagePreviewDialog(this.src);">
+                        <a href="javascript:uploadOneImage('图片上传','#photoImages-000000010-{$key}');">替换</a>
+                        <a href="javascript:(function(){$('#savedImages-000000010-{$key}').remove();})();">移除</a>
+                    </li>
+                </foreach>
+            </ul>
+            <else/>
+            <ul id="imagesId000000010" class="pic-list list-unstyled form-inline">
+                <li id="savedImages-000000010" style="margin-bottom: 5px;">
+                </li>
+            </ul>
+        </if>
+        <a href="javascript:uploadMultiImage('图片上传','#imagesId000000010','itemImages-000000010');"
+           class="btn btn-sm btn-default">选择图片</a>
+        <script type="text/html" id="itemImages-000000010">
+            <li id="savedImages-000000010-{id}" style="margin-bottom: 5px;">
+                <input id="photoImages-000000010-{id}" type="hidden" name="images[{id}]" value="{filepath}">
+                <img id="photoImages-000000010-{id}-preview" src="{url}" height="50"
+                     onclick="imagePreviewDialog(this.src);">
+                <a href="javascript:uploadOneImage('图片上传','#photoImages-000000010-{id}');">替换</a>
+                <a href="javascript:(function(){$('#savedImages-000000010-{id}').remove();})();">移除</a>
+            </li>
+        </script>
+        <script>
+            // 多图上传支持排序
+            new Sortable(imagesId000000010, {
+                animation: 150,
+                ghostClass: 'blue-background-class'
+            });
+        </script>
+    </div>
+</div>
+
+
+<!--图文详情-->
+<div class="form-group">
+    <label class="col-sm-2 control-label">图文详情:</label>
+    <div class="layui-input-block col-sm-6">
+        <script type="text/plain" id="content" name="content">
+            {:cmf_replace_content_file_url(htmlspecialchars_decode($content))}
+ </script>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    //编辑器路径定义
+    var editorURL = GV.WEB_ROOT;
+</script>
+<script type="text/javascript" src="/static/js/ueditor/ueditor.config.js?v=00001"></script>
+<script type="text/javascript" src="/static/js/ueditor/ueditor.all.min.js"></script>
+<!--编辑器支持秀米-->
+<script type="text/javascript" src="/static/js/ueditor/xiumi/xiumi-ue-dialog-v5.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/js/ueditor/xiumi/xiumi-ue-v5.css"/>
+<script type="text/javascript">
+    $(function () {
+        //详情
+        editorcontent = new baidu.editor.ui.Editor();
+        editorcontent.render('content');
+
+        try {
+            editorcontent.sync();
+        } catch (err) {
+        }
+    });
+</script>
+
+
+<script type="text/javascript">
+    var goods_id = "{$id}"
+
+    // 商品规格
+    var specData = [];
+    var skuData = {}
+    var is_attribute = 0;
+    if (goods_id) {
+        //获取数据
+        $.ajax({
+            url: "{:url('getEditData')}",
+            type: "POST",
+            data: {goods_id: goods_id},
+            async: false,
+            success: function (res) {
+                if (res.code === 1) {
+                    specData = res.data.specData;
+                    skuData = res.data.skuData;
+                    is_attribute = res.data.is_attribute;
+                } else {
+                    layer.msg(res.msg, {icon: 7});
+                }
+            }
+        });
+    }
+
+    //layui方法===========================================
+    layui.config({
+        base: '__TMPL__/public/lib/sku-module/', // 设定扩展的 layui 模块的所在目录，一般用于外部模块扩展
+    }).use(['form', 'skuTable'], function () {
+        var form = layui.form,
+            skuTable = layui.skuTable;
+        //商品规格
+        var obj = skuTable.render({
+            isAttributeValue: is_attribute, //规格类型 0统一规格 1多规格
+            isAttributeElemId: 'fairy-is-attribute', //规格类型容器id
+            specTableElemId: 'fairy-spec-table', //规格表容器id
+            skuTableElemId: 'fairy-sku-table', //sku表容器id
+            sortable: true, //规格拖拽排序
+            rowspan: true, //sku表相同属性值是否合并行
+            specData: specData, //规格数据
+            skuData: skuData, //多规格格式
+            requestSuccessCode: 1, //请求成功返回状态码值
+            uploadUrl: './uploadImage', //上传接口地址，接口要求返回格式参考 upload.json
+            //统一规格配置项
+            singleSkuTableConfig: {
+                thead: [
+                    {title: '价格', icon: 'layui-icon-cols'},
+                    {title: '划线价', icon: 'layui-icon-cols'},
+                    {title: '库存', icon: 'layui-icon-cols'},
+                ],
+                tbody: [
+                    {type: 'input', field: 'price', value: '', verify: 'required|number', reqtext: '价格不能为空'},
+                    {type: 'input', field: 'line_price', value: '', verify: 'required|number', reqtext: '划线价不能为空'},
+                    {type: 'input', field: 'stock', value: '', verify: 'required|number', reqtext: '库存不能为空'},
+                ]
+            },
+            //多规格配置项
+            multipleSkuTableConfig: {
+                thead: [
+                    {title: '图片', icon: ''},
+                    {title: '价格', icon: 'layui-icon-cols'},
+                    {title: '划线价', icon: 'layui-icon-cols'},
+                    {title: '库存', icon: 'layui-icon-cols'},
+                ],
+                tbody: [
+                    {type: 'image', field: 'image', value: '', verify: '', reqtext: ''},
+                    {type: 'input', field: 'price', value: '', verify: 'required|number', reqtext: '价格不能为空'},
+                    {type: 'input', field: 'line_price', value: '', verify: 'required|number', reqtext: '划线价不能为空'},
+                    {type: 'input', field: 'stock', value: '', verify: 'required|number', reqtext: '库存不能为空'},
+                ]
+            },
+            // 统一规格格式
+            // skuData: {
+            //     'price': '80',
+            //     'market_price': '100',
+            //     'cost_price': '60',
+            //     'stock': '999',
+            //     'status': '0',
+            // }
+        });
+        //监听规格添加
+        form.on('submit(submit)', function (data) {
+            //获取表单数据
+            var attr_data = [];
+            if (data.field.is_attribute == 1) {
+                //获取规格数据
+                attr_data = obj.getSpecData();
+                var state = Object.keys(data.field).some(function (item, index, array) {
+                    return item.startsWith('skus');
+                });
+                if (!state) {
+                    layer.msg('sku表数据不能为空', {icon: 5, anim: 6});
+                }
+            }
+            var post_data = data.field;
+            post_data.goods_id = goods_id;
+            post_data.attr_data = attr_data;
+            $.ajax({
+                url: "{:url('edit_post')}",
+                type: "POST",
+                data: post_data,
+                success: function (res) {
+                    if (res.code === 1) {
+                        layer.msg(res.msg, {icon: 1});
+                        if (!goods_id) {
+                            setTimeout(function () {
+                                parent.location.reload();
+                            }, 1000)
+                        } else {
+                            setTimeout(function () {
+                                //     location.reload();
+                                window.location.href = "{:url('index')}";
+                            }, 1000)
+
+                        }
+                    } else {
+                        layer.msg(res.msg, {icon: 7});
+                    }
+                }
+            });
+
+            return false;
+        });
+    })
+</script>
+

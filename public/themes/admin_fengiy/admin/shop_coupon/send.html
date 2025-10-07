@@ -1,0 +1,145 @@
+<include file="public@header"/></head>
+<body>
+<div class="wrap js-check-wrap">
+
+
+    <form class="js-ajax-form" method="post" autocomplete="off">
+
+        <br>
+        <div class="table-actions">
+            <button class="layui-btn layui-btn-primary layui-border-blue  js-ajax-submit" type="submit"
+                    data-action="{:url('send_post',['coupon_id'=>$coupon_id,'page'=>$page,'params'=>$params])}"
+                    data-subcheck="true" data-msg="确定发放优惠券吗？">发放
+            </button>
+        </div>
+
+
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th style="text-align:center;width: 20px;line-height: 32px;">
+                    <label>
+                        <input style="transform: scale(1.5);" type="checkbox" class="js-check-all" data-direction="x"
+                               data-checklist="js-check-x">
+                    </label>
+                </th>
+                <th style="">ID</th>
+                <th style="">用户信息</th>
+                <th style="">手机号</th>
+                <th style="">创建时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <foreach name="user_list" item="vo">
+                <tr>
+                    <td style="text-align:center;width: 20px;line-height: 32px;">
+                        <input type="checkbox" class="js-check" data-yid="js-check-y" data-xid="js-check-x" name="ids[]"
+                               style="transform: scale(1.5);" value="{$vo.id}">
+                    </td>
+                    <td>{$vo.id}</td>
+                    <td>
+                        <div style="display: flex;align-items: center;">
+                            <if condition="!empty($vo['avatar'])">
+                                <a href="javascript:imagePreviewDialog('{:cmf_get_image_preview_url($vo.avatar)}');">
+                                    <img class="img-rounded" src="{:cmf_get_image_preview_url($vo.avatar)}"
+                                         style="width:40px;height:40px;">
+                                </a>
+                            </if>
+                            <div style="margin-left: 6px;">
+                                <span ondblclick="copyContent('{$vo.openid}')">{$vo.nickname}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{$vo.phone}</td>
+                    <td>{$vo.create_time|date='Y-m-d H:i:s'}</td>
+
+                </tr>
+            </foreach>
+            </tbody>
+        </table>
+
+        <button class="layui-btn layui-btn-primary layui-border-blue  js-ajax-submit" type="submit"
+                data-action="{:url('send_post',['coupon_id'=>$coupon_id,'page'=>$page,'params'=>$params])}"
+                data-subcheck="true" data-msg="确定发放优惠券吗？">发放
+        </button>
+
+    </form>
+
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+</body>
+</html>
+
+<script>
+    layui.use(['layer', 'form', 'slider'], function () {
+        var layer = layui.layer, form = layui.form;
+
+
+        form.on('switch(is_admin)', function (data) {
+            batchPost(data.value, 'is_admin', this.checked ? 1 : 2)
+        });
+
+
+    });
+</script>
+
+<script>
+    //复制变量
+    function copyContent(clickContent) {
+        //获取要赋值的input的元素
+        var inputElement = document.getElementById("copy_content");
+        //给input框赋值
+        // clickContent = clickContent.replace(/\s+/g, '');
+        inputElement.value = clickContent;
+        //选中input框的内容
+        inputElement.select();
+        // 执行浏览器复制命令
+        document.execCommand("Copy");
+        //提示已复制
+        layer.msg(clickContent + '已复制', {icon: 6, time: 700});
+    }
+
+
+    //修改状态
+    function batchPost(id, field, value) {
+        $.ajax({
+            url: "{:url('batch_post')}",
+            type: "POST",
+            data: {id: id, [field]: value},
+            success: function (res) {
+                if (res.code === 1) {
+                    layer.msg(res.msg, {icon: 1});
+
+                    let time1 = setInterval(function () {
+                        //页面自动刷新
+                        location.reload();
+                    }, 500);
+
+
+                } else {
+                    layer.msg(res.msg, {icon: 7});
+                }
+            }
+        });
+    }
+
+</script>
+
+
+<script>
+    //导出
+    $(".ajax-export").click(function () {
+        //alert("正在开发中...");
+        $(".is_export").val(1);
+        $(".ajax-form").submit();
+        $(".is_export").val(0);
+        return false;
+    });
+
+    //搜索
+    $(".bt_search").click(function () {
+        $(".w-form-search").removeAttr('action');
+        $(".w-form-search").attr('action', "/index.html");
+        $(".w-form-search").submit();
+    });
+</script>
