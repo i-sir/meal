@@ -190,7 +190,7 @@ class CompanyAddressController extends AuthController
 
         /** 查询数据 **/
         $params["InterfaceType"] = "api";//接口类型
-        $params["DataFormat"]    = "find";//数据格式,find详情,list列表
+        $params["DataFormat"]    = "find";//数据格式,find详情,list列表.
         $result                  = $CompanyAddressInit->get_find($where, $params);
         if (empty($result)) $this->error("暂无数据");
 
