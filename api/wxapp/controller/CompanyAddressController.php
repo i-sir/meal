@@ -145,57 +145,6 @@ class CompanyAddressController extends AuthController
     }
 
 
-    /**
-     * 公司地址列表 详情
-     * @OA\Post(
-     *     tags={"公司地址列表"},
-     *     path="/wxapp/company_address/find_address",
-     *
-     *
-     *
-     *    @OA\Parameter(
-     *         name="id",
-     *         in="query",
-     *         description="id",
-     *         required=false,
-     *         @OA\Schema(
-     *             type="string",
-     *         )
-     *     ),
-     *
-     *
-     *
-     *     @OA\Response(response="200", description="An example resource"),
-     *     @OA\Response(response="default", description="An example resource")
-     * )
-     *
-     *   test_environment: http://meal.ikun:9090/api/wxapp/company_address/find_address
-     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/company_address/find_address
-     *   api:  /wxapp/company_address/find_address
-     *   remark_name: 公司地址列表 详情
-     *
-     */
-    public function find_address()
-    {
-        $CompanyAddressInit  = new \init\CompanyAddressInit();//公司地址列表    (ps:InitController)
-        $CompanyAddressModel = new \initmodel\CompanyAddressModel(); //公司地址列表   (ps:InitModel)
-
-        /** 获取参数 **/
-        $params            = $this->request->param();
-        $params["user_id"] = $this->user_id;
-
-        /** 查询条件 **/
-        $where   = [];
-        $where[] = ["id", "=", $params["id"]];
-
-        /** 查询数据 **/
-        $params["InterfaceType"] = "api";//接口类型
-        $params["DataFormat"]    = "find";//数据格式,find详情,list列表.
-        $result                  = $CompanyAddressInit->get_find($where, $params);
-        if (empty($result)) $this->error("暂无数据");
-
-        $this->success("详情数据", $result);
-    }
  
 
 }

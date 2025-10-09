@@ -315,9 +315,9 @@ class ShopGoodsController extends AuthController
      *
      *
      *    @OA\Parameter(
-     *         name="is_hot",
+     *         name="week",
      *         in="query",
-     *         description="true热门",
+     *         description="周几 数字1-7",
      *         required=false,
      *         @OA\Schema(
      *             type="string",
@@ -419,11 +419,10 @@ class ShopGoodsController extends AuthController
         $where[] = ["type", "=", $params["type"] ?? 'goods'];
         if ($params["keyword"]) $where[] = ["goods_name|code", "like", "%{$params['keyword']}%"];
         if ($params["status"]) $where[] = ["status", "=", $params["status"]];
-        if ($params['is_index']) $where[] = ['is_index', '=', 1];
-        if ($params['is_hot']) $where[] = ['is_hot', '=', 1];
         if ($params['class_id']) $where[] = ['class_id', '=', $params['class_id']];
         if ($params['class_two_id']) $where[] = ['class_two_id', '=', $params['class_two_id']];
         if ($params['search_class_id']) $where[] = ['search_class_id', '=', $params['search_class_id']];
+        if ($params['week']) $where[] = ['', 'EXP', Db::raw("FIND_IN_SET({$params['week']},weeks)")];
 
 
         /** 查询数据 **/
@@ -510,59 +509,6 @@ class ShopGoodsController extends AuthController
         $this->success("详情数据", $result);
     }
 
-
-    /**
-     * 商品评论 列表
-     * @OA\Post(
-     *     tags={"商品管理"},
-     *     path="/wxapp/shop_goods/find_goods_comment",
-     *
-     *
-     *
-     *    @OA\Parameter(
-     *         name="goods_id",
-     *         in="query",
-     *         description="商品id",
-     *         required=false,
-     *         @OA\Schema(
-     *             type="string",
-     *         )
-     *     ),
-     *
-     *
-     *
-     *     @OA\Response(response="200", description="An example resource"),
-     *     @OA\Response(response="default", description="An example resource")
-     * )
-     *
-     *   test_environment: http://meal.ikun:9090/api/wxapp/shop_goods/find_goods_comment
-     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/shop_goods/find_goods_comment?goods_id=28
-     *   api:  /wxapp/shop_goods/find_goods_comment
-     *   remark_name: 商品评价 列表
-     *
-     */
-    public function find_goods_comment()
-    {
-        $BaseCommentInit = new \init\BaseCommentInit();//商品评价    (ps:InitController)
-        $params          = $this->request->param();
-
-        /** 查询条件 **/
-        $where = [];
-        $where[] = ["type", "=", 'goods'];
-        $where[] = ["pid", "=", $params["goods_id"]];
-
-
-        /** 查询数据 **/
-        $params["InterfaceType"] = "api";//接口类型
-        $params["DataFormat"]    = "list";//数据格式,find详情,list列表
-        $params["field"]         = "*";//过滤字段
-
-        /** 查询数据 **/
-        $result = $BaseCommentInit->get_list_paginate($where, $params);
-
-
-        $this->success("详情数据", $result);
-    }
 
 
 

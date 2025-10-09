@@ -16,6 +16,25 @@ class TaskInit
 
 
     /**
+     * 操作购物车,自动清空当天购物车
+     */
+    public function operation_cart()
+    {
+        $ShopCartModel = new \initmodel\ShopCartModel();
+
+        if (date('H:i') == '23:59') {
+            $map   = [];
+            $map[] = ['id', '<>', 0];
+            $ShopCartModel->where($map)->strict(false)->update([
+                'delete_time' => time(),
+                'update_time' => time(),
+            ]);
+        }
+
+        echo("操作购物车,自动清空当天购物车,执行成功\n" . cmf_random_string(80) . "\n" . date('Y-m-d H:i:s') . "\n");
+    }
+
+    /**
      * 自动取消订单
      */
     public function operation_cancel_order()

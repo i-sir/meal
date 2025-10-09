@@ -57,13 +57,13 @@
                     <th style="">排序</th>
                 </if>
                 <th style="">ID</th>
-                <th style="">分类</th>
+<!--                <th style="">分类</th>-->
                 <th style="">商品名称</th>
                 <th style="">价格</th>
                 <th style="">封面</th>
                 <th style="">库存</th>
-                <th style="">首页推荐</th>
-                <th style="">热门推荐</th>
+<!--                <th style="">首页推荐</th>-->
+<!--                <th style="">热门推荐</th>-->
                 <th style="">显示</th>
                 <th style="">创建时间</th>
 
@@ -81,7 +81,7 @@
                         </td>
                     </if>
                     <td>{$vo.id|default=''}</td>  <!--本我-->
-                    <td>{$vo.class_name|default=''}</td>  <!--分类-->
+<!--                    <td>{$vo.class_name|default=''}</td>  &lt;!&ndash;分类&ndash;&gt;-->
                     <td>{$vo.goods_name|default=''}</td>  <!--商品名称-->
                     <td>{$vo.price|default=''}</td>  <!--价格-->
                     <td>
@@ -96,26 +96,26 @@
                     </td>
                     <td>{$vo.stock|default=''}</td>  <!--库存-->
 
-                    <td>
-                        <!--首页推荐-->
-                        <div class='layui-form'>
-                            <input type='checkbox' lay-skin='switch' lay-text='是|否' lay-filter='is_index'
-                                   name='is_index'
-                                   value='{$vo.id}'
-                            <if condition='$vo.is_index == 1'>checked</if>
-                            >
-                        </div>
-                    </td>
+<!--                    <td>-->
+<!--                        &lt;!&ndash;首页推荐&ndash;&gt;-->
+<!--                        <div class='layui-form'>-->
+<!--                            <input type='checkbox' lay-skin='switch' lay-text='是|否' lay-filter='is_index'-->
+<!--                                   name='is_index'-->
+<!--                                   value='{$vo.id}'-->
+<!--                            <if condition='$vo.is_index == 1'>checked</if>-->
+<!--                            >-->
+<!--                        </div>-->
+<!--                    </td>-->
 
-                    <td>
-                        <!--是否显示-->
-                        <div class='layui-form'>
-                            <input type='checkbox' lay-skin='switch' lay-text='是|否' lay-filter='is_hot' name='is_hot'
-                                   value='{$vo.id}'
-                            <if condition='$vo.is_hot == 1'>checked</if>
-                            >
-                        </div>
-                    </td>
+<!--                    <td>-->
+<!--                        &lt;!&ndash;是否显示&ndash;&gt;-->
+<!--                        <div class='layui-form'>-->
+<!--                            <input type='checkbox' lay-skin='switch' lay-text='是|否' lay-filter='is_hot' name='is_hot'-->
+<!--                                   value='{$vo.id}'-->
+<!--                            <if condition='$vo.is_hot == 1'>checked</if>-->
+<!--                            >-->
+<!--                        </div>-->
+<!--                    </td>-->
                     <td>
                         <!--是否显示-->
                         <div class='layui-form'>

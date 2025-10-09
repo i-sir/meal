@@ -10,7 +10,7 @@
        value="goods">
 
 <!--分类-->
-<div class="form-group">
+<div class="form-group" style="display:none;">
     <div class="layui-form-item">
         <label class="col-sm-2 control-label">分类:</label>
         <div class="col-md-6 col-sm-10">
@@ -209,6 +209,105 @@
     </div>
 </div>
 
+<!--
+
+index列表
+        if ($item['class_ids']) {
+            $class_ids               = $this->getParams($item['class_ids']);
+            $class_names             = $ShopClassModel->where('id', 'in', $class_ids)->column('name');
+            $item['class_names']     = $this->setParams($class_names);
+            $item['class_name_list'] = $class_names;
+            $item['class_ids']       = $class_ids;
+        }
+
+
+
+edit编辑
+      //处理分类结果值
+        if ($params['class_ids']) {
+            $class_ids           = array_keys($params['class_ids']);//提取key
+            $params['class_ids'] = $this->setParams($class_ids);
+        }else{
+          $params['class_ids'] = '';
+        }
+-->
+<div class="form-group">
+    <label class="col-sm-2 control-label">周:</label>
+    <div class="layui-input-block col-sm-6">
+
+
+        <input class="form-control post-params" lay-skin="tag" name="weeks[1]"
+               title="周一"
+               type="checkbox"
+        <if condition="in_array(1,$weeks)">
+            checked
+        </if>
+        >
+
+
+        <input class="form-control post-params" lay-skin="tag" name="weeks[2]"
+               title="周二"
+               type="checkbox"
+        <if condition="in_array(2,$weeks)">
+            checked
+        </if>
+        >
+        </input>
+
+
+        <input class="form-control post-params" lay-skin="tag" name="weeks[3]"
+               title="周三"
+               type="checkbox"
+        <if condition="in_array(3,$weeks)">
+            checked
+        </if>
+        >
+        </input>
+
+
+        <input class="form-control post-params" lay-skin="tag" name="weeks[4]"
+               title="周四"
+               type="checkbox"
+        <if condition="in_array(4,$weeks)">
+            checked
+        </if>
+        >
+        </input>
+
+
+        <input class="form-control post-params" lay-skin="tag" name="weeks[5]"
+               title="周五"
+               type="checkbox"
+        <if condition="in_array(5,$weeks)">
+            checked
+        </if>
+        >
+        </input>
+
+
+        <input class="form-control post-params" lay-skin="tag" name="weeks[6]"
+               title="周六"
+               type="checkbox"
+        <if condition="in_array(6,$weeks)">
+            checked
+        </if>
+        >
+        </input>
+
+
+        <input class="form-control post-params" lay-skin="tag" name="weeks[7]"
+               title="周日"
+               type="checkbox"
+        <if condition="in_array(7,$weeks)">
+            checked
+        </if>
+        >
+        </input>
+
+
+    </div>
+</div>
+
 
 <!--标签-->
 <div class="form-group">
@@ -218,8 +317,6 @@
         <p class="help-block text-danger">使用/隔开最多三个</p>
     </div>
 </div>
-
-
 
 
 <!-- 规格类型 -->
@@ -300,7 +397,10 @@
     <div class="layui-input-block col-sm-6">
         <script type="text/plain" id="content" name="content">
             {:cmf_replace_content_file_url(htmlspecialchars_decode($content))}
- </script>
+
+
+
+        </script>
     </div>
 </div>
 

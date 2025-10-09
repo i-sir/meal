@@ -217,6 +217,14 @@ class ShopGoodsController extends AdminBaseController
         if ($params['class_two_id']) $params['search_class_id'] = $params['class_two_id'];
 
 
+        //处理周信息
+        if ($params['weeks']) {
+            $weeks           = array_keys($params['weeks']);//提取key
+            $params['weeks'] = $this->setParams($weeks);
+        }else{
+            $params['weeks'] = '';
+        }
+
         //处理规格数据
         $ShopGoodsInit->edit_sku_post($params, $goods_id);//普通商品-规格
 

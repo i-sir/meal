@@ -76,6 +76,9 @@ class ShopGoodsInit extends Base
         if ($two_info && $one_info) $item['class_name'] = $one_info['name'] . ' - ' . $two_info['name'];
 
 
+        //周列表
+        if ($item['weeks']) $item['weeks'] = $this->getParams($item['weeks']);
+
         /** 处理文字描述 **/
 
 
