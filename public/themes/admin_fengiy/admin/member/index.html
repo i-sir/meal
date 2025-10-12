@@ -22,7 +22,7 @@
 
 
         <button type="submit" class="layui-btn" style="margin-left: 10px">搜索</button>
-        <!--<a type="button" class="layui-btn layui-bg-blue ajax-export" href="javascript:;">导出</a>-->
+        <a type="button" class="layui-btn layui-bg-blue ajax-export" href="javascript:;">导出</a>
         <a class="layui-btn layui-bg-red" href="{:url('index',array('params'=>$params))}">清空</a>
         <input type="hidden" name="is_export" class="is_export" value="0">
 
@@ -39,7 +39,9 @@
                 <th style="width: 60px">ID</th>
                 <th style="width: 60px">用户信息</th>
                 <th style="width: 60px">手机号</th>
+                <th style="width: 60px">拉黑</th>
                 <th style="width: 60px">创建时间</th>
+                <th style="width: 60px">操作</th>
             </tr>
             </thead>
             <tbody>
@@ -60,7 +62,21 @@
                         </div>
                     </td>
                     <td>{$vo.phone}</td>
+                    <td>
+                        <div class="layui-form">
+                            <input type="checkbox" lay-skin="switch" lay-text="拉黑|正常" lay-filter="is_black"
+                                   name="is_black"
+                                   value="{$vo.id}"
+                            <if condition="$vo.is_black == 1">checked</if>
+                            >
+                        </div>
+                    </td>
                     <td>{$vo.create_time|date='Y-m-d H:i:s'}</td>
+
+                    <td>
+                        <a class="layui-btn layui-btn-primary layui-border-red layui-btn-xs js-ajax-delete"
+                           href="{:url('delete',array('id'=>$vo.id,'page'=>$page,'params'=>$params))}">删除</a>
+                    </td>
 
 
                 </tr>
@@ -75,7 +91,18 @@
 </body>
 </html>
 
+<script>
+    layui.use(['layer', 'form', 'slider'], function () {
+        var layer = layui.layer, form = layui.form;
 
+
+        form.on('switch(is_black)', function (data) {
+            batchPost(data.value, 'is_black', this.checked ? 1 : 2)
+        });
+
+
+    });
+</script>
 <script>
     //复制变量
     function copyContent(clickContent) {

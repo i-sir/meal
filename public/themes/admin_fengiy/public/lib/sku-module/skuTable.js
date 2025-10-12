@@ -625,7 +625,7 @@ layui.define(['jquery', 'form', 'upload', 'layer', 'sortable'], function (export
                         prependTbody.push(prependTbodyItem);
                 });
 
-                table += '<colgroup>' + '<col width="70">'.repeat(prependThead.length + 1) + '</colgroup>';
+                table += '<colgroup>' + '<col>'.repeat(prependThead.length + 1) + '</colgroup>';
 
                 table += '<thead>';
                 if (prependThead.length > 0) {

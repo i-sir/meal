@@ -390,6 +390,17 @@ class ShopGoodsController extends AuthController
      *     ),
      *
      *
+     *     @OA\Parameter(
+     *         name="day",
+     *         in="query",
+     *         description="日期 2025-08-09",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *         )
+     *     ),
+     *
+     *
      *
      *
      *     @OA\Response(response="200", description="An example resource"),
@@ -529,10 +540,10 @@ class ShopGoodsController extends AuthController
         $ShopGoodsSkuAttrModel   = new \initmodel\sku\ShopGoodsSkuAttrModel();
 
 
-        $map       = [];
-        $map[]     = ['goods_id', '=', $goods_id];
-        $map[]     = ['status', '=', 1];
-        $map[]     = ['stock', '>', 0];
+        $map   = [];
+        $map[] = ['goods_id', '=', $goods_id];
+        $map[] = ['status', '=', 1];
+        //$map[]     = ['stock', '>', 0];
         $goods_sku = $ShopGoodsSkuModel
             ->field('id as sku_id,goods_id,price,line_price,stock,sell_count,image')
             ->where($map)

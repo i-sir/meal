@@ -52,8 +52,9 @@ class ShopGoodsClassController extends AdminBaseController
 
 
         $ShopGoodsClassInit = new \init\ShopGoodsClassInit();//shop_goods_class     (ps:InitController)
-        $this->assign('type_list', $ShopGoodsClassInit->type);
+
     }
+
 
 
     /**

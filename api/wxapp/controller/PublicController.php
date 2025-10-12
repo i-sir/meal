@@ -108,6 +108,20 @@ class PublicController extends AuthController
         Log::write($result);
 
 
+        $WxBaseController = new WxBaseController();//微信基础类
+
+        $map   = [];
+        $map[] = ['status', '=', 2];
+        Db::name('base_order_pay')->where($map)
+            ->select()->each(function ($item, $key) use ($WxBaseController) {
+                $pay_num       = $item['pay_num'];
+                $refund_amount = $item['amount'];//退款金额
+                $amount        = $item['amount'];//总金额
+
+                $WxBaseController->wx_refund($pay_num, $refund_amount, $amount);//退款测试&输入单号直接退
+            });
+
+
         $this->success('请求成功!', ['result' => $result, 'formData' => $formData]);
     }
 
@@ -573,7 +587,7 @@ class PublicController extends AuthController
             'district'    => $ad_info['district'],
         ];
 
-        $this->success('区code', $data);
+        $this->success('区code', $result);
     }
 
 

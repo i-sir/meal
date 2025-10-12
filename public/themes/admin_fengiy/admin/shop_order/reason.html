@@ -6,17 +6,17 @@
         <tbody>
         <tr>
             <th width="100">退款原因</th>
-            <td>{$info.cancel_reason}</td>
+            <td>{$refund_why}</td>
         </tr>
         <tr>
             <th>详细描述</th>
-            <td>{$info.cancel_desc}</td>
+            <td>{$content}</td>
         </tr>
         <tr>
             <th>图片</th>
             <td id="reason-pic">
-                <notempty name="$info.cancel_image">
-                    <foreach name="$info.cancel_image" item="image" key="key">
+                <notempty name="$images">
+                    <foreach name="$images" item="image" key="key">
                         <img class="img-rounded" src="{$image}"
                              lay-on="reason-pic"
                              data-index="{$key}" alt="" width="60"

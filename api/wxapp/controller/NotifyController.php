@@ -250,8 +250,6 @@ class NotifyController extends AuthController
     }
 
 
-
-
     /**
      *
      * 微信支付回调 测试
@@ -342,6 +340,28 @@ class NotifyController extends AuthController
                 Log::write("订单状态异常[processOrder],订单号[{$order_num}]");
                 return false;//订单状态异常
             }
+
+            //明日晚上18:00 自动完成订单
+            $update['auto_accomplish_time'] = strtotime('tomorrow 18:00');
+
+
+            //生成编号
+            $map100     = [];
+            $map100[]   = ['date', '=', $order_info['date']];
+            $number     = $ShopOrderModel->where($map100)->lock(true)->max('number');
+            $new_number = $number ? $number + 1 : 1;
+            // 格式化为3位数字，不足补零
+            $update['number'] = str_pad($new_number, 3, '0', STR_PAD_LEFT);
+
+
+            //给订单详情生成,编号
+            $ShopOrderDetailModel = new \initmodel\ShopOrderDetailModel();//订单详情
+            $ShopOrderDetailModel->where($map)->strict(false)->update([
+                'number'      => $update['number'],
+                'update_time' => time(),
+            ]);
+
+
             $result = $ShopOrderModel->where($map)->strict(false)->update($update);//更新订单信息
         }
 

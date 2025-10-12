@@ -56,9 +56,15 @@
                    style="width: 260px;"
                    type="text" value="{$order_date}">
 
+            <br>
+            <br>
+            预定时间:
+            <input class="form-control js-date" name="date" placeholder="请选择预定时间" style="width: 240px;"
+                   type="text" value="{:input('date/s','')}">
+
 
             <button class="layui-btn" style="margin-left: 10px" type="submit">搜索</button>
-            <!--<a type="button" class="layui-btn layui-bg-blue ajax-export" href="javascript:;">导出</a>-->
+            <a type="button" class="layui-btn layui-bg-blue ajax-export" href="javascript:;">导出</a>
             <a class="layui-btn layui-bg-red" href="{:url('index',array('params'=>$params))}">清空</a>
 
 
@@ -151,23 +157,6 @@
                                    title="{$vo.remark|default=''}"></i>
                             </if>
 
-                            <span style="margin-left: 1%;">
-                               <cite>店铺:</cite>
-                                <a href="javascript:imagePreviewDialog('{:cmf_get_image_preview_url($vo.shop_info.logo_image)}');">
-                                  <img class="" height="25" width="25" src="{$vo.shop_info.logo_image}">
-                                   </a>
-                                  <span style="margin-right: 10px;">(ID:{$vo.shop_id}) {$vo.shop_info.name}-{$vo.shop_info.phone}</span>
-                            </span>
-
-
-                            <!--                            <span class="layui-btn layui-btn-primary layui-border-green layui-btn-xs"-->
-                            <!--                                  style="margin-left: 20px;">快递发货</span>-->
-
-                            <span style="float: right;" class="layui-btn-xs layui-btn-primary layui-border-green">
-                               <a href="{:url('index',array('page'=>$page,'type'=>$vo.type,'order_num'=>$order_num,'goods_name'=>$goods_name,'order_date'=>$order_date))}">
-                                   {$vo.type_name}
-                               </a>
-                            </span>
 
                         </td>
                     </tr>
@@ -200,13 +189,7 @@
                                                         <if condition="$goods.sku_name">
                                                             <span class="tags">{$goods.sku_name}</span>
                                                         </if>
-                                                        <if condition="$goods.status != 0">
-                                                            <div style="margin-top: 5px;">
-                                                                <a class="layui-btn layui-btn-primary layui-border-red layui-btn-xs"
-                                                                   href="javascript:parent.openIframeLayer('{:url('shop_order_refund/find',array('detail_id'=>$goods.id))}','',{ area: ['65%', '85%'],move:'.layui-layer-title'},false);"
-                                                                >退款原因</a>
-                                                            </div>
-                                                        </if>
+
                                                     </div>
                                                 </if>
                                             </div>
@@ -219,33 +202,15 @@
                         </td>
 
                         <td class="text-center">
-                            <div class="price-summary">
-                                <div class="price-row">
-                                    <div class="price-label"><cite>优惠：</cite></div>
-                                    <div class="price-value">&yen; {$vo.coupon_amount}</div>
-                                </div>
-                                <div class="price-row">
-                                    <div class="price-label"><cite>运费：</cite></div>
-                                    <div class="price-value">&yen; {$vo.freight_amount}</div>
-                                </div>
-                                <div class="price-row">
-                                    <div class="price-label"><cite>使用积分：</cite></div>
-                                    <div class="price-value">&yen; {$vo.point}</div>
-                                </div>
-                                <div class="price-row">
-                                    <div class="price-label"><cite>积分抵扣：</cite></div>
-                                    <div class="price-value">&yen; {$vo.point_balance}</div>
-                                </div>
-                                <div class="price-row">
-                                    <div class="price-label"><cite>支付金额：</cite></div>
-                                    <div class="price-value">&yen; {$vo.amount}</div>
-                                </div>
-                                <notempty name="$vo.pay_time">
-                                    <div style="margin-bottom: 10px;margin-top: 5px;margin-left:15%;display: flex;">
-                                        <span class="layui-btn layui-btn-primary layui-border-purple layui-btn-xs">{$vo.pay_type_name}</span>
-                                    </div>
-                                </notempty>
-                            </div>
+                            &yen; {$vo.amount}
+                            <if condition="10 < $vo.status">
+                                <a data-toggle="tooltip"
+                                   href="javascript:openIframeLayer('{:url('reason',['id'=>$vo.id])}','查看退款原因',{area: ['800px', '460px']})"
+                                   style="margin-left: 5px"
+                                   title="退款原因">
+                                    <i class="layui-icon layui-icon-question layui-font-22 layui-font-red"></i>
+                                </a>
+                            </if>
                         </td>
 
 
@@ -254,93 +219,35 @@
                                 <span class="layui-btn-xs layui-btn layui-btn-primary layui-border-orange{$vo.status_color}">
                                     {$vo.status_name}
                                 </span>
-                                <!--                                <if condition="10 < $vo.status">-->
-                                <!--                                    <a data-toggle="tooltip"-->
-                                <!--                                       href="javascript:openIframeLayer('{:url('reason',['id'=>$vo.id])}','查看退款原因',{area: ['800px', '460px']})"-->
-                                <!--                                       style="margin-left: 5px"-->
-                                <!--                                       title="退款原因">-->
-                                <!--                                        <i class="layui-icon layui-icon-question layui-font-22 layui-font-red"></i>-->
-                                <!--                                    </a>-->
-                                <!--                                </if>-->
+
                             </div>
                         </td>
 
                         <td class="text-center">
                             <div class="operate">
-                                <!--                                <a class="layui-bg-blue-light layui-circle op-btn"-->
-                                <!--                                   data-id="{$vo.id}"-->
-                                <!--                                   data-notes="{$vo.admin_remark}"-->
-                                <!--                                   data-toggle="tooltip"-->
-                                <!--                                   lay-on="order-tips"-->
-                                <!--                                   title="{$vo.admin_remark?'修改备注':'添加备注'}">-->
-                                <!--                                    <i class="layui-icon layui-icon-edit"></i>-->
-                                <!--                                </a>-->
 
-                                <if condition="$vo.status==2">
-                                    <a class="layui-bg-gray-light layui-circle op-btn"
-                                       data-toggle="tooltip"
-                                       href="javascript:parent.openIframeLayer('{:url('send',['id'=>$vo.id])}','发货',{area: ['80%', '80%']},true)"
-                                       title="发货">
-                                        <i class="layui-icon layui-icon-release"></i>
-                                    </a>
 
+                                <if condition="$vo.status==12">
                                     <a class="layui-bg-gray-light layui-circle op-btn"
                                        data-id="{$vo.id}"
                                        data-toggle="tooltip"
-                                       lay-on="send-confirm"
-                                       title="确认配送？">
-                                        <i class="layui-icon layui-icon-release"></i>
+                                       lay-on="pass-reject"
+                                       title="确认退款？">
+                                        <i class="layui-icon layui-icon-face-smile"></i>
                                     </a>
-                                </if>
 
 
-                                <if condition="$vo.status==2">
+                                    <!--无拒绝理由-->
                                     <a class="layui-bg-gray-light layui-circle op-btn"
                                        data-id="{$vo.id}"
                                        data-toggle="tooltip"
-                                       lay-on="verification_order"
-                                       title="确认核销？">
-                                        <i class="layui-icon layui-icon-unlink"></i>
+                                       lay-on="refund-reject"
+                                       title="拒绝退款？">
+                                        <i class="layui-icon layui-icon-face-cry"></i>
                                     </a>
+
+
                                 </if>
-
-
-                                <!--                                <if condition="$vo.status==12">-->
-                                <!--                                    <a class="layui-bg-gray-light layui-circle op-btn"-->
-                                <!--                                       data-id="{$vo.id}"-->
-                                <!--                                       data-toggle="tooltip"-->
-                                <!--                                       lay-on="pass-reject"-->
-                                <!--                                       title="确认退款？">-->
-                                <!--                                        <i class="layui-icon layui-icon-face-smile"></i>-->
-                                <!--                                    </a>-->
-
-                                <!--                                    &lt;!&ndash;弹出框填写退款金额&ndash;&gt;-->
-                                <!--                                    <a class="layui-bg-gray-light layui-circle op-btn"-->
-                                <!--                                       data-id="{$vo.id}"-->
-                                <!--                                       data-toggle="tooltip"-->
-                                <!--                                       lay-on="pass-reject2"-->
-                                <!--                                       title="确认退款？">-->
-                                <!--                                        <i class="layui-icon layui-icon-face-smile"></i>-->
-                                <!--                                    </a>-->
-
-                                <!--                                    &lt;!&ndash;无拒绝理由&ndash;&gt;-->
-                                <!--                                    <a class="layui-bg-gray-light layui-circle op-btn"-->
-                                <!--                                       data-id="{$vo.id}"-->
-                                <!--                                       data-toggle="tooltip"-->
-                                <!--                                       lay-on="refund-reject"-->
-                                <!--                                       title="拒绝退款？">-->
-                                <!--                                        <i class="layui-icon layui-icon-face-cry"></i>-->
-                                <!--                                    </a>-->
-
-                                <!--                                    &lt;!&ndash; 拒绝退款填写理由&ndash;&gt;-->
-                                <!--                                    <a class="layui-bg-gray-light layui-circle op-btn"-->
-                                <!--                                       data-toggle="tooltip"-->
-                                <!--                                       href="javascript:parent.openIframeLayer('{:url('refuse',['id'=>$vo.id])}','拒绝',{area: ['80%', '80%']})"-->
-                                <!--                                       title="拒绝">-->
-                                <!--                                        <i class="layui-icon layui-icon-face-cry"></i>-->
-                                <!--                                    </a>-->
-
-                                <!--                                </if>-->
 
 
                                 <a class="layui-bg-gray-light layui-circle op-btn"
@@ -351,14 +258,24 @@
                                 </a>
 
 
-                                <a class="layui-bg-gray-light layui-circle op-btn"
-                                   data-id="{$vo.id}"
-                                   data-toggle="tooltip"
-                                   lay-on="delete_order"
-                                   title="删除订单？">
-                                    <i class="layui-icon layui-icon-delete"></i>
-                                </a>
+                                <if condition="in_array($vo.status,[2,8])">
+                                    <a class="layui-bg-gray-light layui-circle op-btn"
+                                       data-id="{$vo.id}"
+                                       data-toggle="tooltip"
+                                       lay-on="label_print"
+                                       title="确认打印标签？">
+                                        <i class="layui-icon layui-icon-component"></i>
+                                    </a>
 
+
+                                    <a class="layui-bg-gray-light layui-circle op-btn"
+                                       data-id="{$vo.id}"
+                                       data-toggle="tooltip"
+                                       lay-on="info_print"
+                                       title="确认打印小票？">
+                                        <i class="layui-icon layui-icon-print"></i>
+                                    </a>
+                                </if>
 
 
                             </div>
@@ -381,10 +298,31 @@
                                     </div>
                                     <div style="display:flex;">
                                         <div style="width: 90px"><cite>地址：</cite></div>
-                                        <div>{$vo.province}-{$vo.city}-{$vo.county}
+                                        <div>
                                             {$vo.address}
                                         </div>
                                     </div>
+                                    <div style="display:flex;">
+                                        <div style="width: 90px"><cite>编号：</cite></div>
+                                        <div>
+                                            <if condition="$vo.number">
+                                                #{$vo.number}
+                                            </if>
+                                        </div>
+                                    </div>
+                                    <div style="display:flex;">
+                                        <div style="width: 90px"><cite>配送时间：</cite></div>
+                                        <div>
+                                            {$vo.delivery_time}
+                                        </div>
+                                    </div>
+                                    <div style="display:flex;">
+                                        <div style="width: 90px"><cite>预定时间：</cite></div>
+                                        <div>
+                                            {$vo.date} ( {$vo.week_name})
+                                        </div>
+                                    </div>
+
 
                                     <notempty name="$vo.admin_remark">
                                         <div style="display:flex;">
@@ -406,12 +344,6 @@
                                         </div>
                                     </notempty>
 
-                                    <notempty name="$vo.send_time">
-                                        <div style="display:flex;text-align: right;">
-                                            <div style="width: 120px"><cite>发货时间：</cite></div>
-                                            <div>{$vo.send_time|date='Y-m-d H:i:s'}</div>
-                                        </div>
-                                    </notempty>
                                     <notempty name="$vo.accomplish_time">
                                         <div style="display:flex; text-align: right;">
                                             <div style="width: 120px"><cite>完成时间：</cite></div>
@@ -624,7 +556,6 @@
             },
 
 
-
             //打印小票
             'order-print': function () {
                 var orderId = $(this).attr("data-id"); //当前订单ID
@@ -660,6 +591,55 @@
                             if (res.code == 1) {
                                 layer.msg('操作成功!', {icon: 1, time: 1000}, function () {
                                     location.reload();
+                                });
+                            } else {
+                                layer.msg(res.msg, {icon: 7});
+                            }
+                        },
+                    })
+                }, function () {
+                    layer.msg('已取消!', {icon: 2});
+                });
+            },
+
+
+            //打印
+            'label_print': function () {
+                var orderId = $(this).attr("data-id"); //当前订单ID
+                console.log(orderId)
+                layer.confirm('确认打印？', {icon: 3}, function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "label_print",
+                        data: {id: orderId, status: 4},
+                        success: function (res) {
+                            if (res.code == 1) {
+                                layer.msg('打印成功!', {icon: 1, time: 1000}, function () {
+                                    //location.reload();
+                                });
+                            } else {
+                                layer.msg(res.msg, {icon: 7});
+                            }
+                        },
+                    })
+                }, function () {
+                    layer.msg('已取消!', {icon: 2});
+                });
+            },
+
+            //打印
+            'info_print': function () {
+                var orderId = $(this).attr("data-id"); //当前订单ID
+                console.log(orderId)
+                layer.confirm('确认打印？', {icon: 3}, function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "info_print",
+                        data: {id: orderId, status: 4},
+                        success: function (res) {
+                            if (res.code == 1) {
+                                layer.msg('打印成功!', {icon: 1, time: 1000}, function () {
+                                    //location.reload();
                                 });
                             } else {
                                 layer.msg(res.msg, {icon: 7});

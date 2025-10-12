@@ -470,20 +470,22 @@ class MemberController extends AdminBaseController
             //用户信息
 
             $item['userInfo'] = "(ID:{$item['id']}) {$item['nickname']}";
+
+            $item['create_time'] = date("Y-m-d H:i:s", $item['create_time']);
         }
 
         $headArrValue = [
             ["rowName" => "ID", "rowVal" => "id", "width" => 10],
             ["rowName" => "用户信息", "rowVal" => "userInfo", "width" => 30],
             ["rowName" => "手机号", "rowVal" => "phone", "width" => 20],
-            ["rowName" => "身份类型", "rowVal" => "identity_name", "width" => 20],
-            ["rowName" => "身份证号", "rowVal" => "identity_number", "width" => 30],
-            ["rowName" => "积分", "rowVal" => "balance", "width" => 20],
-            ["rowName" => "性别", "rowVal" => "gender", "width" => 20],
-            ["rowName" => "年龄", "rowVal" => "age", "width" => 20],
-            ["rowName" => "学历", "rowVal" => "educational", "width" => 30],
-            ["rowName" => "开户行", "rowVal" => "opening_bank", "width" => 30],
-            ["rowName" => "银行卡号", "rowVal" => "number_bank", "width" => 30],
+//            ["rowName" => "身份类型", "rowVal" => "identity_name", "width" => 20],
+//            ["rowName" => "身份证号", "rowVal" => "identity_number", "width" => 30],
+//            ["rowName" => "积分", "rowVal" => "balance", "width" => 20],
+//            ["rowName" => "性别", "rowVal" => "gender", "width" => 20],
+//            ["rowName" => "年龄", "rowVal" => "age", "width" => 20],
+//            ["rowName" => "学历", "rowVal" => "educational", "width" => 30],
+//            ["rowName" => "开户行", "rowVal" => "opening_bank", "width" => 30],
+//            ["rowName" => "银行卡号", "rowVal" => "number_bank", "width" => 30],
             ["rowName" => "创建时间", "rowVal" => "create_time", "width" => 30],
         ];
 

@@ -23,6 +23,180 @@
             </div>
         </div>
 
+        分类:
+        <div class="form-group">
+            <div class="layui-form-item">
+                <div class="col-md-6 col-sm-10" style="display: flex;margin-top: 10px;width: 180px;">
+                    <select name="class_id" lay-search lay-filter="classList">
+                        <option value=""
+                        <if condition="$class_id eq '' ">selected</if>
+                        >暂不选择</option>
+                        <foreach name="class_list" key="key" item="vo">
+                            <option value="{$vo.id}"
+                            <if condition="$class_id eq $vo.id ">selected</if>
+                            > {$vo.name}</option>
+                        </foreach>
+                    </select>
+                    <input type="hidden" id="one_id" value="{$class_id}">
+                </div>
+                <div class="col-md-6 col-sm-10" style="display: flex;margin-top: 10px;width: 180px;">
+                    <select class="two_id" name="class_two_id" lay-search lay-filter="classTwoList">
+                        <option value=""
+                        <if condition="$class_two_id eq '' ">selected</if>
+                        >暂不选择</option>
+                    </select>
+                    <input type="hidden" id="two_id" value="{$class_two_id}">
+                </div>
+            </div>
+
+            <!--后台代码-->
+            <!--
+
+
+            //获取一级分类
+            $ClassInit  = new \init\ClassInit();//分类管理    (ps:InitController)
+            $map = [];
+            $map[] = ['pid','=',0];
+            $this->assign('class_list', $ClassInit->get_list($map));
+
+
+
+            //获取二级分类列表
+            public function get_class_list()
+            {
+                $params = $this->request->param();
+                //分类
+                $MemberKnowledgeModel = new \initmodel\MemberKnowledgeModel(); //知识库   (ps:InitModel)
+                $MemberKnowledgeClassInit  = new \init\MemberKnowledgeClassInit();//分类管理    (ps:InitController)
+                $MemberKnowledgeClassModel = new \initmodel\MemberKnowledgeClassModel(); //分类管理   (ps:InitModel)
+
+                //查询二级条件.
+                $map = [];
+                if ($params['one_id']) $map[] = ['pid', '=', $params['one_id']];//查询二级列表
+                if (empty(count($map))) $this->success('请求成功');
+
+                //二级列表
+                $two_list = $MemberKnowledgeClassInit->get_list($map);
+                //查询数据,方便展示二级下拉框选中值
+                if ($params['item_id']) {
+                    $item_info = $MemberKnowledgeModel->where(['id' => $params['item_id']])->find();
+                    if ($item_info) {
+                        foreach ($two_list as $k => &$v) {
+                            $v['selected'] = false;
+                            //这里的branch_id 更改为二级,三级id
+                            if ($params['one_id'] && $item_info['class_two_id'] == $v['id']) $v['selected'] = 'selected';//选中
+                        }
+                    }
+                }
+                $this->success('请求成功', '', $two_list);
+            }
+
+
+
+            /**
+             * 获取二分类,回显使用
+             */
+            public function get_class_two_list()
+             {
+             $TradeWarehouseInit = new \init\TradeWarehouseInit();//仓位管理    (ps:InitController)
+
+             $params = $this->request->param();
+             $map    = [];
+             $map[]  = ['pid', '=', $params['one_id']];
+
+             $result = $TradeWarehouseInit->get_list($map);
+
+             foreach ($result as $k => &$v) {
+             if ($v['id'] == $params['two_id']) $v['selected'] = 'selected';
+             }
+
+             $this->success('成功', '', $result);
+             }
+            -->
+
+            <script>
+                //加载页面自动执行
+                layui.use(['form', 'element'], function () {
+                    var form = layui.form,
+                        element = layui.element;
+
+                    var one_id = $("#one_id").val();//一级
+                    var two_id = $("#two_id").val();//二级
+
+                    //如果一级选中,查二级分类
+                    if (one_id) {
+                        $.ajax({
+                            url: "{:url('get_class_two_list')}",
+                            type: "GET",
+                            data: {
+                                'one_id': one_id,
+                                'two_id': two_id,//二级默认值
+                            },
+                            success: function (res) {
+                                if (res.code == 1) {
+                                    List = res.data;
+                                    var tmp = '<option value="">请选择</option>';
+                                    for (var i in List) {
+                                        //tmp += '<option value="' + List[i].id + '"   "selected=' + List[i].selected + '">' + List[i].name + '</option>';
+                                        tmp += '<option value="' + List[i].id + '"  ' + List[i].selected + '>' + List[i].name + '</option>';
+                                    }
+                                    $(".two_id").html(tmp);//赋值一级分类下拉选择
+                                }
+
+                                form.render('select');
+                            }
+                        });
+                    }
+
+                    //一级选中执行,查询二级列表
+                    form.on('select(classList)', function (data) {
+                        $.ajax({
+                            url: "{:url('get_class_list')}",
+                            type: "GET",
+                            data: {
+                                'one_id': data.value
+                            },
+                            async: false,
+                            success: function (res) {
+                                List = res.data;
+                                if (res.code == 1) {
+                                    var tmp = '<option value="">暂不选择</option>';
+                                    for (var i in List) {
+                                        tmp += '<option value="' + List[i].id + '"  ' + List[i].selected + '>' + List[i].name + '</option>';
+                                    }
+                                    $(".two_id").html(tmp);//赋值二级分类下拉选择
+                                }
+                                form.render('select');
+                            }
+                        });
+                    });
+
+                });
+            </script>
+
+        </div>
+
+
+        周:
+        <div class="form-group">
+            <div class="layui-form-item">
+                <div class="col-md-6 col-sm-10" style="display: flex;margin-top: 10px;width: 180px;">
+                    <select name="week" lay-search>
+                        <option value=""
+                        <if condition="$week eq '' ">selected</if>
+                        >暂不选择</option>
+                        <foreach name="week_list" key="key" item="vo">
+                            <option value="{$key}"
+                            <if condition="$week eq $key ">selected</if>
+                            > {$vo}</option>
+                        </foreach>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+
+
         <button type="submit" class="layui-btn" style="margin-left: 10px">搜索</button>
         <a class="layui-btn layui-bg-red" href="{:url('index',['pid'=>$pid,'type'=>'goods','params'=>$params])}">清空</a>
 
@@ -57,13 +231,11 @@
                     <th style="">排序</th>
                 </if>
                 <th style="">ID</th>
-<!--                <th style="">分类</th>-->
+                <th style="">分类</th>
                 <th style="">商品名称</th>
                 <th style="">价格</th>
                 <th style="">封面</th>
                 <th style="">库存</th>
-<!--                <th style="">首页推荐</th>-->
-<!--                <th style="">热门推荐</th>-->
                 <th style="">显示</th>
                 <th style="">创建时间</th>
 
@@ -81,7 +253,7 @@
                         </td>
                     </if>
                     <td>{$vo.id|default=''}</td>  <!--本我-->
-<!--                    <td>{$vo.class_name|default=''}</td>  &lt;!&ndash;分类&ndash;&gt;-->
+                    <td>{$vo.class_name|default=''}</td>  <!--分类-->
                     <td>{$vo.goods_name|default=''}</td>  <!--商品名称-->
                     <td>{$vo.price|default=''}</td>  <!--价格-->
                     <td>
@@ -96,26 +268,6 @@
                     </td>
                     <td>{$vo.stock|default=''}</td>  <!--库存-->
 
-<!--                    <td>-->
-<!--                        &lt;!&ndash;首页推荐&ndash;&gt;-->
-<!--                        <div class='layui-form'>-->
-<!--                            <input type='checkbox' lay-skin='switch' lay-text='是|否' lay-filter='is_index'-->
-<!--                                   name='is_index'-->
-<!--                                   value='{$vo.id}'-->
-<!--                            <if condition='$vo.is_index == 1'>checked</if>-->
-<!--                            >-->
-<!--                        </div>-->
-<!--                    </td>-->
-
-<!--                    <td>-->
-<!--                        &lt;!&ndash;是否显示&ndash;&gt;-->
-<!--                        <div class='layui-form'>-->
-<!--                            <input type='checkbox' lay-skin='switch' lay-text='是|否' lay-filter='is_hot' name='is_hot'-->
-<!--                                   value='{$vo.id}'-->
-<!--                            <if condition='$vo.is_hot == 1'>checked</if>-->
-<!--                            >-->
-<!--                        </div>-->
-<!--                    </td>-->
                     <td>
                         <!--是否显示-->
                         <div class='layui-form'>
@@ -135,13 +287,7 @@
                             <a class="layui-btn layui-btn-primary layui-border-green layui-btn-xs"
                                href="{:url('edit',['goods_id'=>$vo.id,'pid'=>$pid,'type'=>'goods','page'=>$page,'params'=>$params])}">编辑</a>
                         </if>
-                        <div style="display: none;">
-                            <if condition="cmf_auth_check(cmf_get_current_admin_id(),'admin/shop_goods/edit')">
-                                <a class="layui-btn layui-btn-primary layui-border-green layui-btn-xs"
-                                   href="javascript:parent.openIframeLayer('{:url('edit',['id'=>$vo.id,'pid'=>$pid,'type'=>'goods','page'=>$page,'params'=>$params])}','编辑',{ area: ['65%', '85%'],move:'.layui-layer-title'},true);"
-                                >编辑(弹框-更改后台方法,跳转页面)</a>
-                            </if>
-                        </div>
+
                         <if condition="cmf_auth_check(cmf_get_current_admin_id(),'admin/shop_goods/delete')">
                             <a class="layui-btn layui-btn-primary layui-border-red layui-btn-xs js-ajax-delete"
                                href="{:url('delete',['id'=>$vo.id,'pid'=>$pid,'type'=>'goods','page'=>$page,'params'=>$params])}">删除</a>

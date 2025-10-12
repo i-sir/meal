@@ -24,6 +24,16 @@ use think\facade\Db;
 class ShopGoodsInit extends Base
 {
 
+    public $week_list = [
+        1 => '周一',
+        2 => '周二',
+        3 => '周三',
+        4 => '周四',
+        5 => '周五',
+        6 => '周六',
+        7 => '周日'
+    ];
+
     public $type = [
         'goods' => '普通商品'
     ];//商品类型
@@ -57,6 +67,11 @@ class ShopGoodsInit extends Base
     {
         $ShopGoodsClassModel = new \initmodel\ShopGoodsClassModel();//分类管理   (ps:InitModel)
         //$BaseLikeModel       = new \initmodel\BaseLikeModel(); //点赞&收藏   (ps:InitModel)
+        $ShopGoodsSkuModel = new \initmodel\sku\ShopGoodsSkuModel();
+
+
+        $starting_time = cmf_config('starting_time');//订餐开始时间
+        $end_time      = cmf_config('end_time');//订餐结束时间
 
 
         //接口类型
@@ -78,6 +93,20 @@ class ShopGoodsInit extends Base
 
         //周列表
         if ($item['weeks']) $item['weeks'] = $this->getParams($item['weeks']);
+
+
+        //检测是否开始购买
+        $item['is_buy'] = true;
+        if ($starting_time > date('H:i')) $item['is_buy'] = false;
+        if ($end_time < date('H:i')) $item['stock'] = 0;//如果超过截止时间,则库存为0
+        if ($params['date'] != date('Y-m-d', strtotime('+1 day'))) $item['is_buy'] = false;
+
+        //计算库存
+        if ($item['is_attribute'] == 1) {
+            $map           = [];
+            $map[]         = ['goods_id', '=', $item['id']];
+            $item['stock'] = $ShopGoodsSkuModel->where($map)->sum('stock');
+        }
 
         /** 处理文字描述 **/
 
@@ -482,13 +511,14 @@ class ShopGoodsInit extends Base
 
                 // 保存SKU
                 $sku_data = [
-                    'line_price'  => $sku_item['line_price'] ?? 0,
-                    'price'       => $sku_item['price'] ?? 0,
-                    'stock'       => $sku_item['stock'] ?? 0,
-                    'image'       => $sku_item['image'],
-                    'status'      => 1,
-                    'goods_id'    => $goods_id,
-                    'update_time' => time()
+                    'line_price'    => $sku_item['line_price'] ?? 0,
+                    'price'         => $sku_item['price'] ?? 0,
+                    'stock'         => $sku_item['stock'] ?? 0,
+                    'image'         => $sku_item['image'],
+                    'default_stock' => $sku_item['default_stock'] ?? 0,
+                    'status'        => 1,
+                    'goods_id'      => $goods_id,
+                    'update_time'   => time()
                 ];
 
                 $map      = [
@@ -544,10 +574,11 @@ class ShopGoodsInit extends Base
             }
 
             // 2.4 更新商品最小价格和总库存
-            $min_price      = $ShopGoodsSkuModel->where(['status' => 1, 'goods_id' => $goods_id])->min('price');
-            $min_line_price = $ShopGoodsSkuModel->where(['status' => 1, 'goods_id' => $goods_id])->min('line_price');
-            $total_stock    = $ShopGoodsSkuModel->where(['status' => 1, 'goods_id' => $goods_id])->sum('stock');
-            $ShopGoodsModel->where(['id' => $goods_id])->strict(false)->update(['stock' => $total_stock, 'price' => $min_price, 'line_price' => $min_line_price]);
+            $min_price           = $ShopGoodsSkuModel->where(['status' => 1, 'goods_id' => $goods_id])->min('price');
+            $min_line_price      = $ShopGoodsSkuModel->where(['status' => 1, 'goods_id' => $goods_id])->min('line_price');
+            $total_stock         = $ShopGoodsSkuModel->where(['status' => 1, 'goods_id' => $goods_id])->sum('stock');
+            $total_default_stock = $ShopGoodsSkuModel->where(['status' => 1, 'goods_id' => $goods_id])->sum('default_stock');
+            $ShopGoodsModel->where(['id' => $goods_id])->strict(false)->update(['stock' => $total_stock, 'default_stock' => $total_default_stock, 'price' => $min_price, 'line_price' => $min_line_price]);
         }
 
         // 3. 删除无效数据

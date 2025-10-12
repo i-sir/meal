@@ -58,12 +58,8 @@
                 </if>
                 <th style="">ID</th>
                 <th style="">名称</th>
-                <if condition="$pid">
-<!--                    <th style="">图片</th>-->
-                </if>
-                <if condition="empty($pid)">
-                    <th style="">首页推荐</th>
-                </if>
+                <th style="">图片</th>
+
                 <th style="">显示</th>
                 <th style="">创建时间</th>
 
@@ -82,29 +78,17 @@
                     </if>
                     <td>{$vo.id|default=''}</td>  <!--本我-->
                     <td>{$vo.name|default=''}</td>  <!--名称-->
-                    <if condition="$pid">
-<!--                        <td>-->
-<!--                            &lt;!&ndash;图片&ndash;&gt;-->
-<!--                            <if condition='!empty($vo.image)'>-->
-<!--                                <a href="javascript:imagePreviewDialog('{:cmf_get_asset_url($vo.image)}');">-->
-<!--                                    <img src='{:cmf_get_asset_url($vo.image)}' style='height:40px;'>-->
-<!--                                </a>-->
-<!--                                <else/>-->
-<!--                                暂无上传-->
-<!--                            </if>-->
-<!--                        </td>-->
-                    </if>
-                    <if condition="empty($pid)">
-                        <td>
-                            <!--首页推荐-->
-                            <div class='layui-form'>
-                                <input type='checkbox' lay-skin='switch' lay-text='是|否' lay-filter='is_index'
-                                       name='is_index' value='{$vo.id}'
-                                <if condition='$vo.is_index == 1'>checked</if>
-                                >
-                            </div>
-                        </td>
-                    </if>
+                    <td>
+                        <!--图片-->
+                        <if condition='!empty($vo.image)'>
+                            <a href="javascript:imagePreviewDialog('{:cmf_get_asset_url($vo.image)}');">
+                                <img src='{:cmf_get_asset_url($vo.image)}' style='height:40px;'>
+                            </a>
+                            <else/>
+                            暂无上传
+                        </if>
+                    </td>
+
                     <td>
                         <!--显示-->
                         <div class='layui-form'>

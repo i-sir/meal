@@ -42,8 +42,17 @@ class ShopGoodsController extends AdminBaseController
      */
     protected function base_index()
     {
+        $ShopGoodsInit = new \init\ShopGoodsInit();//shop_goods     (ps:InitController)
+        $this->assign('week_list', $ShopGoodsInit->week_list);
+
+        $ShopGoodsClassInit = new \init\ShopGoodsClassInit();//shop_goods_class     (ps:InitController)
+        $map = [];
+        $map[] = ['pid','=',0];
+        $this->assign('class_list', $ShopGoodsClassInit->get_list($map));
 
     }
+
+
 
     /**
      * 编辑,添加基础信息
@@ -98,6 +107,26 @@ class ShopGoodsController extends AdminBaseController
 
 
     /**
+     * 获取二分类,回显使用
+     */
+    public function get_class_two_list()
+    {
+        $ShopGoodsClassInit = new \init\ShopGoodsClassInit();//分类管理     (ps:InitController)
+
+        $params = $this->request->param();
+        $map    = [];
+        $map[]  = ['pid', '=', $params['one_id']];
+
+        $result = $ShopGoodsClassInit->get_list($map);
+
+        foreach ($result as $k => &$v) {
+            if ($v['id'] == $params['two_id']) $v['selected'] = 'selected';
+        }
+
+        $this->success('成功', '', $result);
+    }
+
+    /**
      * 首页列表数据
      * @adminMenu(
      *     'name'             => 'ShopGoods',
@@ -124,7 +153,10 @@ class ShopGoodsController extends AdminBaseController
         $where = [];
         if ($params["keyword"]) $where[] = ["goods_name", "like", "%{$params["keyword"]}%"];
         $where[] = ["type", "=", $params["type"] ?? 'goods'];
+        if ($params["class_id"]) $where[] = ["class_id", "=", $params["class_id"]];
+        if ($params["class_two_id"]) $where[] = ["class_two_id", "=", $params["class_two_id"]];
         if ($params["test"]) $where[] = ["test", "=", $params["test"]];
+        if ($params["week"]) $where[] = ['', 'EXP', Db::raw("FIND_IN_SET({$params['week']},weeks)")];
         //if($params["status"]) $where[]=["status","=", $params["status"]];
         //$where[]=["type","=", 1];
 
@@ -221,7 +253,7 @@ class ShopGoodsController extends AdminBaseController
         if ($params['weeks']) {
             $weeks           = array_keys($params['weeks']);//提取key
             $params['weeks'] = $this->setParams($weeks);
-        }else{
+        } else {
             $params['weeks'] = '';
         }
 
@@ -376,7 +408,7 @@ class ShopGoodsController extends AdminBaseController
         $is_attribute = $goods_info['is_attribute']; // 是否是多规格商品
 
         // 需要获取的字段数组
-        $field_arr = ['image', 'price', 'line_price', 'stock'];
+        $field_arr = ['image', 'price', 'line_price', 'stock','default_stock'];
 
         // 初始化返回数据
         $result = [

@@ -22,8 +22,10 @@ namespace app\admin\controller;
  */
 
 
+use api\wxapp\controller\InitController;
 use api\wxapp\controller\WxBaseController;
 use initmodel\AssetModel;
+use plugins\fe_print\FePrintPlugin;
 use plugins\weipay\lib\PayController;
 use think\App;
 use think\facade\Cache;
@@ -74,6 +76,7 @@ class ShopOrderController extends AdminBaseController
         if ($params['keyword']) $where[] = ['phone|username|order_num', 'like', "%{$params['keyword']}%"];
         if ($params['order_num']) $where[] = ['order_num', 'like', "%{$params['order_num']}%"];
         if ($params['goods_name']) $where[] = ['goods_name', 'like', "%{$params['goods_name']}%"];
+        if ($params['date']) $where[] = ['date', '=', $params['date']];
         if ($params['user_id']) $where[] = ['user_id', '=', $params['user_id']];
 
 
@@ -111,7 +114,7 @@ class ShopOrderController extends AdminBaseController
         $count      = [];
         foreach ($status_arr as $key => $status) {
             $map                    = [];
-            $map[]                  = ['status', '=', $key];
+            $map[]                  = ['status', 'in', $ShopOrderInit->admin_status_where[$key]];
             $map                    = array_merge($map, $where);
             $count[$key]['count']   = $ShopOrderModel->where($map)->count();
             $count[$key]['key']     = $key;
@@ -145,7 +148,7 @@ class ShopOrderController extends AdminBaseController
         if ($params['cav_code']) $where[] = ["cav_code", "=", $params["cav_code"]];
 
 
-        $result  = $ShopOrderInit->get_find($where);
+        $result = $ShopOrderInit->get_find($where);
 
 
         if (empty($result)) $this->error("暂无数据");
@@ -158,6 +161,228 @@ class ShopOrderController extends AdminBaseController
         return $this->fetch();
     }
 
+
+    //标签打印
+    public function label_print()
+    {
+        $ShopOrderInit  = new \init\ShopOrderInit();//订单管理
+        $InitController = new InitController();//基础类
+
+        /** 获取参数 **/
+        $params = $this->request->param();
+
+        /** 查询条件 **/
+        $where = [];
+        if ($params['id']) $where[] = ["id", "=", $params["id"]];
+        if ($params['order_num']) $where[] = ["order_num", "=", $params["order_num"]];
+        if ($params['cav_code']) $where[] = ["cav_code", "=", $params["cav_code"]];
+
+        //订单信息
+        $order_info = $ShopOrderInit->get_find($where);
+        if (empty($order_info)) $this->error("暂无数据");
+
+        //封装打印方法
+        $result = $InitController->labelPrint($order_info['order_num']);
+
+        //报错
+        if ($result['code'] == 0) $this->error($result['msg']);
+
+
+        $this->success('打印成功');
+    }
+
+
+    //小票打印
+    public function info_print()
+    {
+        $ShopOrderInit  = new \init\ShopOrderInit();//订单管理
+        $InitController = new InitController();//基础类
+
+
+        /** 获取参数 **/
+        $params = $this->request->param();
+
+        /** 查询条件 **/
+        $where = [];
+        if ($params['id']) $where[] = ["id", "=", $params["id"]];
+        if ($params['order_num']) $where[] = ["order_num", "=", $params["order_num"]];
+        if ($params['cav_code']) $where[] = ["cav_code", "=", $params["cav_code"]];
+
+
+        //订单信息
+        $order_info = $ShopOrderInit->get_find($where);
+        if (empty($order_info)) $this->error("暂无数据");
+
+
+        //封装打印方法
+        $result = $InitController->infoPrint($order_info['order_num']);
+
+        //报错
+        if ($result['code'] == 0) $this->error($result['msg']);
+
+
+        $this->success('打印成功');
+    }
+
+
+    /**
+     * 文本换行处理
+     * @param string $text      原始文本
+     * @param int    $maxLength 每行最大字符数
+     * @param int    $maxNumber 最大总字符数（超过此长度将添加省略号）
+     * @return string 处理后的文本（包含换行符）
+     */
+    private function wrapText($text, $maxLength, $maxNumber)
+    {
+        if (empty($text)) {
+            return $text;
+        }
+
+        // 先截取最大字符数
+        if (mb_strlen($text) > $maxNumber) {
+            $text = mb_substr($text, 0, $maxNumber) . '...';
+        }
+
+        $wrappedText   = '';
+        $currentLength = 0;
+
+        for ($i = 0; $i < mb_strlen($text); $i++) {
+            $char = mb_substr($text, $i, 1);
+
+            if ($currentLength >= $maxLength) {
+                $wrappedText   .= "\n";
+                $currentLength = 0;
+            }
+
+            $wrappedText .= $char;
+            $currentLength++;
+        }
+
+        return $wrappedText;
+    }
+
+
+    /**
+     * [统计字符串字节数补空格，实现左右排版对齐]
+     * @param  [string] $str_left    [左边字符串]
+     * @param  [string] $str_right   [右边字符串]
+     * @param  [int]    $length      [输入当前纸张规格一行所支持的最大字母数量]
+     *                               58mm的机器,一行打印16个汉字,32个字母;76mm的机器,一行打印22个汉字,33个字母,80mm的机器,一行打印24个汉字,48个字母
+     *                               标签机宽度50mm，一行32个字母，宽度40mm，一行26个字母
+     * @return [string]              [返回处理结果字符串]
+     */
+    function LR($str_left, $str_right, $length)
+    {
+        if (empty($str_left) || empty($str_right) || empty($length)) return '请输入正确的参数';
+        $kw               = '';
+        $str_left_lenght  = strlen(iconv("UTF-8", "GBK//IGNORE", $str_left));
+        $str_right_lenght = strlen(iconv("UTF-8", "GBK//IGNORE", $str_right));
+        $k                = $length - ($str_left_lenght + $str_right_lenght);
+        for ($q = 0; $q < $k; $q++) {
+            $kw .= ' ';
+        }
+        return $str_left . $kw . $str_right;
+    }
+
+
+    /**
+     * 设置商品信息样式
+     * @param $arr 商品信息
+     * @param $A
+     * @param $B
+     * @param $C
+     * @param $D
+     * @return string
+     */
+    function set_goods($arr, $A = 14, $B = 6, $C = 3, $D = 6)
+    {
+        $orderInfo = '--------------------------------<BR>';
+        foreach ($arr as $k5 => $v5) {
+            $name = $v5['goods_name'];
+            if ($v5['sku_name']) $name .= 'SKU:[' . $v5['sku_name'] . ']';
+            $price    = $v5['goods_price'];
+            $num      = $v5['count'];
+            $prices   = round($v5['goods_price'] * $v5['count'], 2);
+            $kw3      = '';
+            $kw1      = '';
+            $kw2      = '';
+            $kw4      = '';
+            $str      = $name;
+            $blankNum = $A;//名称控制为14个字节
+            $lan      = mb_strlen($str, 'utf-8');
+            $m        = 0;
+            $j        = 1;
+            $blankNum++;
+            $result = array();
+            if (strlen($price) < $B) {
+                $k1 = $B - strlen($price);
+                for ($q = 0; $q < $k1; $q++) {
+                    $kw1 .= ' ';
+                }
+                $price = $price . $kw1;
+            }
+            if (strlen($num) < $C) {
+                $k2 = $C - strlen($num);
+                for ($q = 0; $q < $k2; $q++) {
+                    $kw2 .= ' ';
+                }
+                $num = $num . $kw2;
+            }
+            if (strlen($prices) < $D) {
+                $k3 = $D - strlen($prices);
+                for ($q = 0; $q < $k3; $q++) {
+                    $kw4 .= ' ';
+                }
+                $prices = $prices . $kw4;
+            }
+            for ($i = 0; $i < $lan; $i++) {
+                $new = mb_substr($str, $m, $j, 'utf-8');
+                $j++;
+                if (mb_strwidth($new, 'utf-8') < $blankNum) {
+                    if ($m + $j > $lan) {
+                        $m      = $m + $j;
+                        $tail   = $new;
+                        $lenght = iconv("UTF-8", "GBK//IGNORE", $new);
+                        $k      = $A - strlen($lenght);
+                        for ($q = 0; $q < $k; $q++) {
+                            $kw3 .= ' ';
+                        }
+                        if ($m == $j) {
+                            $tail .= $kw3 . ' ' . $price . ' ' . $num . ' ' . $prices;
+                        } else {
+                            $tail .= $kw3 . '<BR>';
+                        }
+                        break;
+                    } else {
+                        $next_new = mb_substr($str, $m, $j, 'utf-8');
+                        if (mb_strwidth($next_new, 'utf-8') < $blankNum) continue;
+                        else {
+                            $m        = $i + 1;
+                            $result[] = $new;
+                            $j        = 1;
+                        }
+                    }
+                }
+            }
+            $head = '';
+            foreach ($result as $key => $value) {
+                if ($key < 1) {
+                    $v_lenght = iconv("UTF-8", "GBK//IGNORE", $value);
+                    $v_lenght = strlen($v_lenght);
+                    if ($v_lenght == 13) $value = $value . " ";
+                    $head .= $value . ' ' . $price . ' ' . $num . ' ' . $prices;
+                } else {
+                    $head .= $value . '<BR>';
+                }
+            }
+            $orderInfo .= $head . $tail;
+            @$nums += $prices;
+        }
+
+        $orderInfo .= '--------------------------------<BR>';
+
+        return $orderInfo;
+    }
 
     //提交编辑
     public function edit_post()
@@ -223,8 +448,6 @@ class ShopOrderController extends AdminBaseController
         if ($params['id']) $where[] = ["id", "=", $params["id"]];
         if ($params['order_num']) $where[] = ["order_num", "=", $params["order_num"]];
         if ($params['cav_code']) $where[] = ["cav_code", "=", $params["cav_code"]];
-
-
 
 
         $result = $ShopOrderInit->get_find($where);
@@ -690,9 +913,12 @@ class ShopOrderController extends AdminBaseController
 
 
             //地址信息
-            $addressInfo         = "地址:{$item['province']}-{$item['city']}-{$item['county']}{$item['address']}\n";
-            $addressInfo         .= "姓名:{$item['username']}\n";
-            $addressInfo         .= "电话:{$item['phone']}\n";
+            $addressInfo = "地址:{$item['address']}\n";
+            $addressInfo .= "姓名:{$item['username']}\n";
+            $addressInfo .= "电话:{$item['phone']}\n";
+            if ($item['number']) $addressInfo .= "编号:#{$item['number']}\n";
+            $addressInfo         .= "配送时间:{$item['delivery_time']}\n";
+            $addressInfo         .= "预定时间:{$item['date']} ( {$item['week_name']})\n";
             $item['addressInfo'] = $addressInfo;
 
             //物流信息
@@ -705,6 +931,12 @@ class ShopOrderController extends AdminBaseController
             //用户信息
             $user_info        = $item['user_info'];
             $item['userInfo'] = "(ID:{$user_info['id']}) {$user_info['nickname']}  {$user_info['phone']}";
+
+
+            if ($item['pay_time'] == 0) $item['pay_time'] = '';
+            if ($item['pay_time']) $item['pay_time'] = date('Y-m-d H:i:s', $item['pay_time']);
+            if ($item['accomplish_time']) $item['accomplish_time'] = date('Y-m-d H:i:s', $item['accomplish_time']);
+
         }
 
         $headArrValue = [
@@ -716,8 +948,9 @@ class ShopOrderController extends AdminBaseController
             ["rowName" => "订单金额", "rowVal" => "total_amount", "width" => 30],
             ["rowName" => "收货地址", "rowVal" => "addressInfo", "width" => 30],
             ["rowName" => "商品信息", "rowVal" => "goodsInfo", "width" => 30],
-            ["rowName" => "物流信息", "rowVal" => "expInfo", "width" => 30],
-            ["rowName" => "创建时间", "rowVal" => "create_time", "width" => 30],
+            ["rowName" => "下单时间", "rowVal" => "create_time", "width" => 30],
+            ["rowName" => "支付时间", "rowVal" => "pay_time", "width" => 30],
+            ["rowName" => "完成时间", "rowVal" => "accomplish_time", "width" => 30],
         ];
 
 
@@ -728,7 +961,7 @@ class ShopOrderController extends AdminBaseController
         //        ];
 
         $Excel = new ExcelController();
-        $Excel->excelExports($result, $headArrValue, ["fileName" => "导出"]);
+        $Excel->excelExports($result, $headArrValue, ["fileName" => "订单导出"]);
     }
 
 }

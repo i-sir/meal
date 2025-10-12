@@ -207,7 +207,7 @@ class ShopOrderController extends AuthController
         $params = $this->request->param();
 
         /** 查询条件 **/
-        $where = [];
+        $where   = [];
         $where[] = ['user_id', '=', $this->user_id];
         if ($params['id']) $where[] = ["id", "=", $params["id"]];
         if ($params['order_num']) $where[] = ["order_num", "=", $params["order_num"]];
@@ -344,38 +344,17 @@ class ShopOrderController extends AuthController
     public function get_amount()
     {
         $this->checkAuth();
-        $params              = $this->request->param();
-        $ShopAddressModel    = new \initmodel\ShopAddressModel();//地址管理
-        $ShopCartModel       = new \initmodel\ShopCartModel();//购物车
-        $SkuModel            = new \initmodel\sku\ShopGoodsSkuModel();//sku
-        $ShopGoodsModel      = new \initmodel\ShopGoodsModel();//商品
-        $ShopCouponUserModel = new \initmodel\ShopCouponUserModel(); //优惠券领取记录   (ps:InitModel)
-        $count               = (empty($params['count']) ? 1 : $params['count']) ?? 1;
+        $params         = $this->request->param();
+        $ShopCartModel  = new \initmodel\ShopCartModel();//购物车
+        $SkuModel       = new \initmodel\sku\ShopGoodsSkuModel();//sku
+        $ShopGoodsModel = new \initmodel\ShopGoodsModel();//商品
+        $count          = (empty($params['count']) ? 1 : $params['count']) ?? 1;
 
 
-        //地址信息
-        //        $address_info       = $ShopAddressModel->where('id', '=', $params['address_id'])->find();
-        //        $params['username'] = $address_info['username'];
-        //        $params['phone']    = $address_info['phone'];
-        //        $params['address']  = $address_info['address'];
-        //        $params['province'] = $address_info['province'];
-        //        $params['city']     = $address_info['city'];
-        //        $params['county']   = $address_info['county'];
-
-
-        //优惠券信息
-        if ($params['coupon_id']) {
-            $coupon_info = $ShopCouponUserModel->where('id', '=', $params['coupon_id'])->find();
-            if (empty($coupon_info) || $coupon_info['used'] != 1) $this->error('优惠券信息错误');
-        }
-
-        $amount         = 0;//实际支付金额
-        $goods_amount   = 0;//商品金额
-        $coupon_amount  = 0;//优惠金额
-        $freight_amount = 0;//运费
-        $total_amount   = 0;//订单总金额,实际支付金额+优惠金额+运费
-        $type           = '';//商品类型:商品类型:goods=普通商品,customized=定制商品
-        $goods_list     = [];//将商品信息返回一下
+        $amount        = 0;//实际支付金额
+        $goods_amount  = 0;//商品金额
+        $coupon_amount = 0;//优惠金额
+        $goods_list    = [];//将商品信息返回一下
 
         //下单
         if ($params['cart_ids']) {
@@ -394,9 +373,8 @@ class ShopOrderController extends AuthController
                     $sku_info = $SkuModel->where('id', '=', $cart['sku_id'])->find();
                 } else {
                     //无规格
-                    $sku_info['id']         = 0;
-                    $sku_info['price']      = $goods_info['price'];
-                    $sku_info['line_price'] = $goods_info['line_price'];
+                    $sku_info['id']    = 0;
+                    $sku_info['price'] = $goods_info['price'];
                 }
 
 
@@ -408,7 +386,6 @@ class ShopOrderController extends AuthController
                     'goods_id'   => $goods_info['id'],
                     'goods_name' => $goods_info['goods_name'],
                     'price'      => $goods_info['price'],
-                    'line_price' => $goods_info['line_price'],
                     'sku_name'   => $cart['sku_name'],
                     'count'      => $cart['count'],
                     'image'      => cmf_get_image_url($goods_info['image']),
@@ -419,16 +396,8 @@ class ShopOrderController extends AuthController
             }
 
 
-            //优惠券金额
-            if ($coupon_info) {
-                //优惠券类型:1满减券,2折扣券
-                if ($coupon_info['coupon_type'] == 1) $coupon_amount = $coupon_info['amount'];
-                if ($coupon_info['coupon_type'] == 2) $coupon_amount = round($goods_amount - ($goods_amount * ($coupon_info['discount'] / 100)), 2);
-            }
-
-
-            //订单总金额,商品金额+运费金额
-            $total_amount = $goods_amount + $freight_amount;
+            //订单总金额,商品金额
+            $total_amount = $goods_amount;
 
         } else {
             /**  单独购买  */
@@ -440,9 +409,8 @@ class ShopOrderController extends AuthController
             if ($params['sku_id']) {
                 $sku_info = $SkuModel->where('id', '=', $params['sku_id'])->find();
             } else {
-                $sku_info['id']         = 0;
-                $sku_info['price']      = $goods_info['price'];
-                $sku_info['line_price'] = $goods_info['line_price'];
+                $sku_info['id']    = 0;
+                $sku_info['price'] = $goods_info['price'];
             }
 
 
@@ -450,15 +418,8 @@ class ShopOrderController extends AuthController
             $goods_amount += round($sku_info['price'] * $count, 2);
 
 
-            //优惠券金额
-            if ($coupon_info) {
-                //优惠券类型:1满减券,2折扣券
-                if ($coupon_info['coupon_type'] == 1) $coupon_amount = $coupon_info['amount'];
-                if ($coupon_info['coupon_type'] == 2) $coupon_amount = round($goods_amount - ($goods_amount * ($coupon_info['discount'] / 100)), 2);
-            }
-
-            //订单总金额,商品金额+运费金额
-            $total_amount = $goods_amount + $freight_amount;
+            //订单总金额,商品金额
+            $total_amount = $goods_amount;
 
 
             //商品信息返回一下
@@ -467,7 +428,6 @@ class ShopOrderController extends AuthController
                 'sku_name'   => $params['sku_name'],
                 'goods_name' => $goods_info['goods_name'],
                 'price'      => $goods_info['price'],
-                'line_price' => $goods_info['line_price'],
                 'count'      => $count,
                 'image'      => cmf_get_image_url($goods_info['image']),
             ];
@@ -478,14 +438,14 @@ class ShopOrderController extends AuthController
 
 
         //处理价格
-        $amount = round($goods_amount + $freight_amount - $coupon_amount, 2);//实际支付金额=商品金额+运费金额-优惠金额-满减金额
+        $amount = round($goods_amount, 2);//实际支付金额
 
 
         //价格信息
         $order_insert['coupon_amount'] = round($coupon_amount, 2);//优惠金额
         $order_insert['amount']        = round($amount, 2);//实际支付金额
         $order_insert['goods_amount']  = round($goods_amount, 2);//商品金额
-        $order_insert['total_amount']  = round($total_amount, 2);//订单总金额,实际支付金额+优惠金额+运费金额+会员折扣金额
+        $order_insert['total_amount']  = round($total_amount, 2);//订单总金额
         $order_insert['type']          = $type;//商品类型
         $order_insert['goods_list']    = $goods_list;//商品信息
 
@@ -602,9 +562,9 @@ class ShopOrderController extends AuthController
      *
      *
      *    @OA\Parameter(
-     *         name="coupon_id",
+     *         name="remark",
      *         in="query",
-     *         description="优惠券id (选填)",
+     *         description="备注",
      *         required=false,
      *         @OA\Schema(
      *             type="string",
@@ -650,45 +610,37 @@ class ShopOrderController extends AuthController
         $ShopCartModel        = new \initmodel\ShopCartModel();//购物车
         $SkuModel             = new \initmodel\sku\ShopGoodsSkuModel();//sku
         $ShopGoodsModel       = new \initmodel\ShopGoodsModel();//商品
-        $ShopCouponUserModel  = new \initmodel\ShopCouponUserModel(); //优惠券领取记录   (ps:InitModel)
         $ShopOrderModel       = new \initmodel\ShopOrderModel();//订单管理
         $StockInit            = new \init\StockInit();//库存管理
+        $CompanyAddressModel  = new \initmodel\CompanyAddressModel(); //公司地址列表   (ps:InitModel)
 
 
         //订单基础 信息
-        $order_num                   = $this->get_num_only();
-        $order_insert['user_id']     = $this->user_id;
-        $order_insert['openid']      = $this->openid;
-        $order_insert['wx_openid']   = $this->user_info['openid'];
-        $order_insert['order_num']   = $order_num;
-        $order_insert['user_phone']  = $this->user_info['phone'];
-        $order_insert['p_user_id']   = $this->user_info['pid'];
-        $order_insert['type']        = $params['type'] ?? 'goods';
-        $order_insert['coupon_id']   = $params['coupon_id'];
-        $order_insert['create_time'] = time();
-        $count                       = (empty($params['count']) ? 1 : $params['count']) ?? 1;
+        $order_num                     = $this->get_num_only();
+        $order_insert['user_id']       = $this->user_id;
+        $order_insert['openid']        = $this->openid;
+        $order_insert['wx_openid']     = $this->user_info['openid'];
+        $order_insert['order_num']     = $order_num;
+        $order_insert['user_phone']    = $this->user_info['phone'];
+        $order_insert['p_user_id']     = $this->user_info['pid'];
+        $order_insert['type']          = $params['type'] ?? 'goods';
+        $order_insert['remark']        = $params['remark'];
+        $order_insert['delivery_time'] = $params['delivery_time'];
+        $order_insert['coupon_id']     = $params['coupon_id'];
+        $order_insert['create_time']   = time();
+        $order_insert['date']          = date('Y-m-d', strtotime('+1 day')); // 获取明天的日期（年-月-日）
+        $order_insert['week']          = date('N', strtotime('+1 day'));//获取周几
+        $count                         = (empty($params['count']) ? 1 : $params['count']) ?? 1;
 
         //地址信息
         $address_info = $ShopAddressModel->where('id', '=', $params['address_id'])->find();
         if (empty($address_info)) $this->error('地址信息错误');
+        $address = $CompanyAddressModel->where('id', '=', $address_info['company_id'])->value('address');
+        if (empty($address)) $this->error('地址信息错误!');
         $order_insert['username']    = $address_info['username'];
         $order_insert['phone']       = $address_info['phone'];
-        $order_insert['address']     = $address_info['address'];
-        $order_insert['province']    = $address_info['province'];
-        $order_insert['city']        = $address_info['city'];
-        $order_insert['county']      = $address_info['county'];
         $order_insert['create_time'] = time();
-
-
-        //优惠券信息
-        if ($params['coupon_id']) {
-            $coupon_info = $ShopCouponUserModel->where('id', '=', $params['coupon_id'])->find();
-            if (empty($coupon_info) || $coupon_info['used'] != 1) $this->error('优惠券信息错误');
-            if ($coupon_info) {
-                //核销优惠券
-                $ShopCouponUserModel->where('id', '=', $params['coupon_id'])->update(['used' => 2, 'update_time' => time()]);
-            }
-        }
+        $order_insert['address']     = $address;
 
 
         //订单自动取消时间
@@ -696,13 +648,10 @@ class ShopOrderController extends AuthController
         $order_insert['auto_cancel_time'] = time() + ($automatic_cancellation_order * 60);
 
 
-        $goods_name     = '';
-        $amount         = 0;//实际支付金额
-        $goods_amount   = 0;//商品金额
-        $coupon_amount  = 0;//优惠金额
-        $freight_amount = 0;//运费
-        $total_amount   = 0;//订单总金额,实际支付金额+优惠金额+运费
-        $type           = '';//商品类型:商品类型:goods=普通商品,customized=定制商品
+        $goods_name   = '';
+        $amount       = 0;//实际支付金额
+        $goods_amount = 0;//商品金额
+        $total_amount = 0;//订单总金额
 
 
         //下单
@@ -723,11 +672,10 @@ class ShopOrderController extends AuthController
                     if ($sku_info['stock'] < $cart['count']) $this->error('库存不足请重试!');
                 } else {
                     //无规格
-                    $sku_info['id']         = 0;
-                    $sku_info['price']      = $goods_info['price'];
-                    $sku_info['goods_id']   = $goods_info['id'];
-                    $sku_info['line_price'] = $sku_info['line_price'] ?? $goods_info['line_price'];//划线价
-                    $sku_info['image']      = $goods_info['image'];
+                    $sku_info['id']       = 0;
+                    $sku_info['price']    = $goods_info['price'];
+                    $sku_info['goods_id'] = $goods_info['id'];
+                    $sku_info['image']    = $goods_info['image'];
                     if ($goods_info['stock'] < $cart['count']) $this->error('库存不足请重试!');
                 }
 
@@ -741,7 +689,6 @@ class ShopOrderController extends AuthController
                 $order_detail[$key]['sku_name']     = $cart['sku_name'];
                 $order_detail[$key]['count']        = $cart['count'];
                 $order_detail[$key]['goods_price']  = $sku_info['price'];//单价
-                $order_detail[$key]['line_price']   = $sku_info['line_price'];//划线价
                 $order_detail[$key]['stock']        = $sku_info['stock'] - $cart['count'];//剩余库存
                 $order_detail[$key]['sku_code']     = $sku_info['code'];//编码
                 $order_detail[$key]['total_amount'] = round($sku_info['price'] * $cart['count'], 2);//合计
@@ -762,12 +709,9 @@ class ShopOrderController extends AuthController
 
             $goods_name .= $goods_info['goods_name'] . '/';
 
-            //优惠券金额
-            if ($coupon_info) $coupon_amount = $coupon_info['amount'];
 
-
-            //订单总金额,商品金额+运费金额
-            $total_amount = $goods_amount + $freight_amount;
+            //订单总金额,商品金额
+            $total_amount = $goods_amount;
 
 
             //处理每个商品,最多退款金额
@@ -789,11 +733,10 @@ class ShopOrderController extends AuthController
                 $sku_info = $SkuModel->where('id', '=', $params['sku_id'])->find();
                 if ($sku_info['stock'] < $count) $this->error('库存不足请重试!');
             } else {
-                $sku_info['id']         = 0;
-                $sku_info['price']      = $goods_info['price'];
-                $sku_info['goods_id']   = $goods_info['id'];
-                $sku_info['image']      = $goods_info['image'];
-                $sku_info['line_price'] = $goods_info['line_price'];//划线价
+                $sku_info['id']       = 0;
+                $sku_info['price']    = $goods_info['price'];
+                $sku_info['goods_id'] = $goods_info['id'];
+                $sku_info['image']    = $goods_info['image'];
                 if ($goods_info['stock'] < $count) $this->error('库存不足请重试!');
             }
 
@@ -806,9 +749,7 @@ class ShopOrderController extends AuthController
             $order_detail['sku_name']     = $params['sku_name'];
             $order_detail['count']        = $count;
             $order_detail['goods_price']  = $sku_info['price'];//单价
-            $order_detail['line_price']   = $sku_info['line_price'];//划线价
             $order_detail['stock']        = $sku_info['stock'] - $count;//剩余库存
-            $order_detail['sku_code']     = $sku_info['code'];//编码
             $order_detail['total_amount'] = round($sku_info['price'] * $count, 2);//合计
             $order_detail['order_num']    = $order_num;
             $order_detail['create_time']  = time();
@@ -825,12 +766,8 @@ class ShopOrderController extends AuthController
             $goods_name = $goods_info['goods_name'];
 
 
-            //优惠券金额
-            if ($coupon_info) $coupon_amount = $coupon_info['amount'];
-
-
-            //订单总金额,商品金额+运费金额
-            $total_amount = $goods_amount + $freight_amount;
+            //订单总金额,商品金额
+            $total_amount = $goods_amount;
 
 
             //处理每个商品,最多退款金额
@@ -846,15 +783,13 @@ class ShopOrderController extends AuthController
 
 
         //处理价格
-        $amount = round($goods_amount + $freight_amount - $coupon_amount, 2);//实际支付金额=商品金额+运费金额-优惠金额-满减金额
+        $amount = round($goods_amount, 2);//实际支付金额
 
         //价格信息
-        $order_insert['count']          = $count;//下单数量
-        $order_insert['amount']         = round($amount, 2);//实际支付金额
-        $order_insert['freight_amount'] = round($freight_amount, 2);//运费
-        $order_insert['goods_amount']   = round($goods_amount, 2);//商品金额
-        $order_insert['coupon_amount']  = round($coupon_amount, 2);//优惠金额
-        $order_insert['total_amount']   = round($total_amount, 2);//订单总金额,实际支付金额+优惠金额+运费金额+会员折扣金额
+        $order_insert['count']        = $count;//下单数量
+        $order_insert['amount']       = round($amount, 2);//实际支付金额
+        $order_insert['goods_amount'] = round($goods_amount, 2);//商品金额
+        $order_insert['total_amount'] = round($total_amount, 2);//订单总金额
 
 
         //插入订单
@@ -944,7 +879,7 @@ class ShopOrderController extends AuthController
         $params = $this->request->param();
 
 
-        $where = [];
+        $where   = [];
         $where[] = ['user_id', '=', $this->user_id];
         if ($params['id']) $where[] = ['id', '=', $params['id']];
         if ($params['order_num']) $where[] = ['order_num', '=', $params['order_num']];
@@ -1013,7 +948,6 @@ class ShopOrderController extends AuthController
     }
 
 
-
     /**
      * 申请退款
      * @OA\Post(
@@ -1079,7 +1013,7 @@ class ShopOrderController extends AuthController
         $params = $this->request->param();
 
 
-        $where = [];
+        $where   = [];
         $where[] = ['user_id', '=', $this->user_id];
         if ($params['id']) $where[] = ['id', '=', $params['id']];
         if ($params['order_num']) $where[] = ['order_num', '=', $params['order_num']];
@@ -1093,6 +1027,10 @@ class ShopOrderController extends AuthController
 
         //处理订单
         $update['status']      = 12;
+        $update['images']      = $this->setParams($params['images']);
+        $update['content']     = $params['content'];
+        $update['refund_why']  = $params['refund_why'];
+        $update['refund_num']  = $this->get_num_only('refund_num', 8, 1, '', $ShopOrderModel);
         $update['refund_time'] = time();
         $update['update_time'] = time();
         $result                = $ShopOrderModel->where($where)->strict(false)->update($update);
@@ -1105,6 +1043,7 @@ class ShopOrderController extends AuthController
 
         $this->success("操作成功");
     }
+
 
     /**
      * 设置最多退款金额

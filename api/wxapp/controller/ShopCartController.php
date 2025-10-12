@@ -270,8 +270,10 @@ class ShopCartController extends AuthController
         $user_id  = $this->user_id;
         $userInfo = $this->user_info;
 
+        //只看当日的购物车
         $where   = [];
         $where[] = ['c.user_id', '=', $user_id];
+        $where[] = ['c.create_time', 'between', [strtotime('today'), strtotime('tomorrow') - 1]];
         if ($params['shop_id']) $where[] = ['c.shop_id', '=', $params['shop_id']];
         if ($params['type']) $where[] = ['c.type', '=', $params['type'] ?? 'goods'];
 

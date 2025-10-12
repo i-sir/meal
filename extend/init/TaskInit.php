@@ -35,13 +35,57 @@ class TaskInit
     }
 
     /**
+     * 更新商品库存,恢复成默认库存
+     */
+    public function operation_stock()
+    {
+        $ShopGoodsModel    = new \initmodel\ShopGoodsModel(); //商品管理   (ps:InitModel)
+        $ShopGoodsSkuModel = new \initmodel\sku\ShopGoodsSkuModel();
+
+
+        if (date('H:i') == '00:01') {
+
+            //商品库存
+            $map        = [];
+            $map[]      = ['id', '<>', 0];
+            $map[]      = ['default_stock', '<>', 0];
+            $goods_list = $ShopGoodsModel->where($map)->select();
+            foreach ($goods_list as $k => $goods_info) {
+                $map100   = [];
+                $map100[] = ['id', '=', $goods_info['id']];
+                $ShopGoodsModel->where($map100)->strict(false)->update([
+                    'stock'       => $goods_info['default_stock'],
+                    'update_time' => time(),
+                ]);
+            }
+
+
+            //规格库存
+            $map200   = [];
+            $map200[] = ['id', '<>', 0];
+            $map200[] = ['default_stock', '<>', 0];
+            $sku_list = $ShopGoodsSkuModel->where($map200)->select();
+            foreach ($sku_list as $k => $sku_info) {
+                $map300   = [];
+                $map300[] = ['id', '=', $sku_info['id']];
+                $ShopGoodsSkuModel->where($map300)->strict(false)->update([
+                    'stock'       => $sku_info['default_stock'],
+                    'update_time' => time(),
+                ]);
+            }
+
+        }
+
+        echo("操作购物车,自动清空当天购物车,执行成功\n" . cmf_random_string(80) . "\n" . date('Y-m-d H:i:s') . "\n");
+    }
+
+    /**
      * 自动取消订单
      */
     public function operation_cancel_order()
     {
         $ShopOrderModel       = new \initmodel\ShopOrderModel(); //商城订单   (ps:InitModel)
         $ShopOrderDetailModel = new \initmodel\ShopOrderDetailModel();//订单详情
-        $ShopCouponUserModel  = new \initmodel\ShopCouponUserModel(); //优惠券领取记录   (ps:InitModel)
         $StockInit            = new \init\StockInit();
         $Pay                  = new PayController();
         $OrderPayModel        = new \initmodel\OrderPayModel();
@@ -61,7 +105,7 @@ class TaskInit
             } else {
                 $pay_num = $order_info['pay_num'];
             }
-            $Pay->close_order($pay_num);
+            if ($pay_num) $Pay->close_order($pay_num);
 
 
             //添加库存
@@ -71,10 +115,6 @@ class TaskInit
             }
 
 
-            //优惠券退回
-            if ($order_info['coupon_id']) {
-                $ShopCouponUserModel->where('id', '=', $order_info['coupon_id'])->update(['used' => 1, 'update_time' => time()]);
-            }
         }
 
         $ShopOrderModel->where($map)->strict(false)->update([
@@ -85,6 +125,46 @@ class TaskInit
 
 
         echo("自动取消订单,执行成功\n" . cmf_random_string(80) . "\n" . date('Y-m-d H:i:s') . "\n");
+    }
+
+    /**
+     * 自动打印订单
+     */
+    public function operation_print_order()
+    {
+        $ShopOrderModel = new \initmodel\ShopOrderModel(); //商城订单   (ps:InitModel)
+        $InitController = new InitController();//基础类
+
+
+        //打印时间
+        $print_time = cmf_config('print_time');
+
+        //超过设定时间开始打印
+        if ($print_time < date('H:i')) {
+
+            $map   = [];
+            $map[] = ['date', '=', date('Y-m-d', strtotime("yesterday"))];
+            $map[] = ['status', 'in', [2, 8]];
+            $map[] = ['is_print', '=', 2];
+            $list  = $ShopOrderModel->where($map)->limit(20)->select();
+
+
+            foreach ($list as $key => $order_info) {
+                //标签打印,小票打印
+                $InitController->labelPrint($order_info['order_num']);
+                $InitController->infoPrint($order_info['order_num']);
+
+                //更改状态
+                $ShopOrderModel->where('order_num', '=', $order_info['order_num'])->strict(false)->update([
+                    'is_print'    => 1,
+                    'update_time' => time(),
+                ]);
+            }
+
+        }
+
+
+        echo("自动打印订单,执行成功\n" . cmf_random_string(80) . "\n" . date('Y-m-d H:i:s') . "\n");
     }
 
 
@@ -99,13 +179,13 @@ class TaskInit
 
         $map   = [];
         $map[] = ['auto_accomplish_time', '<', time()];
-        $map[] = ['status', '=', 4];
+        $map[] = ['status', '=', 2];
 
-        $list = $ShopOrderModel->where($map)->field('id,order_num')->select();
-        foreach ($list as $k => $order_info) {
-            //这里处理订单完成后的逻辑
-            $InitController->sendShopOrderAccomplish($order_info['order_num']);
-        }
+        //        $list = $ShopOrderModel->where($map)->field('id,order_num')->select();
+        //        foreach ($list as $k => $order_info) {
+        //            //这里处理订单完成后的逻辑
+        //            $InitController->sendShopOrderAccomplish($order_info['order_num']);
+        //        }
 
         $ShopOrderModel->where($map)->strict(false)->update([
             'status'          => 8,

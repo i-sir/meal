@@ -1,0 +1,193 @@
+<include file="public@header"/>
+
+</head>
+<body>
+<div class="wrap js-check-wrap">
+
+    <form class="well form-inline margin-top-20 layui-form ajax-form w-form-search" method="get" autocomplete="off">
+        时间：
+        <div class="form-group">
+            <div class="layui-form-item">
+                <div class="col-sm-6"
+                     style="display: flex;margin-top: 10px;width: 180px;margin-right: 40px">
+                    <input type="text" class="form-control post-params js-date" name="begin_time"
+                           value="{$begin_time}" placeholder="请输入开始时间">
+                </div>
+            </div>
+        </div>
+        ~
+        <div class="form-group">
+            <div class="layui-form-item">
+                <div class="col-sm-6" style="display: flex;width: 150px;margin-top: 10px;!important;">
+                    <input type="text" class="form-control post-params js-date" name="end_time"
+                           value="{$end_time}" placeholder="请输入结束时间">
+                </div>
+            </div>
+        </div>
+
+
+        <button type="submit" class="layui-btn" style="margin-left: 90px">搜索</button>
+        <a class="layui-btn layui-bg-red" href="{:url('index',['pid'=>$pid,'params'=>$params])}">清空</a>
+
+
+        <!--        <a class="layui-btn layui-bg-blue ajax-export" href="javascript:;">导出</a>-->
+
+        <!-- 如有导出需把  筛选条件在这里用input回显,input需隐藏-->
+        <input type="hidden" name="is_export" class="is_export" value="0">
+        <input type="hidden" name="pid" value="{$pid}">
+    </form>
+
+    <!--总统计-->
+    <div class="layui-row layui-col-space20">
+        <div class="layui-col-xs3">
+            <div class="panel panel-default" style="margin-bottom: 0;">
+                <div class="panel-body text-center">
+                    <i style="font-size: 24px; color: #69C0FF;">{$member_count|default='0'}</i>
+                    <div class="margin-top-10">平台用户</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-col-xs3">
+            <div class="panel panel-default" style="margin-bottom: 0;">
+                <div class="panel-body text-center">
+                    <i style="font-size: 24px; color: #69C0FF;">{$order_count|default='0'}</i>
+                    <div class="margin-top-10">订单数</div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="layui-col-xs3">
+            <div class="panel panel-default" style="margin-bottom: 0;">
+                <div class="panel-body text-center" style="margin-bottom: 0;">
+                    <i style="font-size: 24px; color: #5CDBD3;">{$order_total|default='0'}</i>
+                    <div class="margin-top-10">订单金额</div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div style="text-align: center;margin-top: 4%;font-size: 25px;">
+        用户注册增长
+        <!--        <a href="{:url('excel/technician_frequency_export')}" Target="_blank"-->
+        <!--           style="color: red; text-decoration: none;cursor: pointer;">用户</a>-->
+    </div>
+    <div id="user" style="height: 450px;"></div>
+
+
+    <div style="text-align: center;margin-top: 4%;font-size: 25px;">
+        订单数据
+        <!--        <a href="{:url('excel/technician_frequency_export')}" Target="_blank"-->
+        <!--           style="color: red; text-decoration: none;cursor: pointer;">用户</a>-->
+    </div>
+    <div id="order_amount" style="height: 450px;"></div>
+
+
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+<script src="__TMPL__/public/assets/simpleboot3/js/adminindex.js"></script>
+<script src="__TMPL__/public/assets/js/echarts.js"></script>
+<script src="__TMPL__/public/assets/simpleboot3/js/indexnum.js"></script>
+<script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.5.1/files/dist/echarts.min.js"></script>
+<hook name="admin_before_body_end"/>
+<script type="text/javascript">
+    //图表
+    $(function () {
+        //订单数据量趋势
+        orderChart([10, 11, 13, 11, 12, 12, 9], [1, 2, 2, 5, 3, 2, 0]);
+        //用户数据量趋势
+        userChart([820, 932, 901, 934, 1290, 1330, 1320]);
+    })
+</script>
+</body>
+</html>
+
+<!--柱状图,注册用户-->
+<script type="text/javascript">
+    var dom = document.getElementById('user');
+    var myChart = echarts.init(dom, null, {
+        renderer: 'canvas',
+        useDirtyRect: false
+    });
+    var app = {};
+
+    var xAxis_data = {$xAxis_data};
+    var series_data = {$series_data};
+
+    var option;
+
+    option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: xAxis_data,
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
+        series: series_data
+    };
+
+    if (option && typeof option === 'object') {
+        myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+</script>
+
+
+<!--柱状图,订单金额-->
+<script type="text/javascript">
+    var dom = document.getElementById('order_amount');
+    var myChart = echarts.init(dom, null, {
+        renderer: 'canvas',
+        useDirtyRect: false
+    });
+    var app = {};
+
+    var xAxis_data = {$xAxis2_data};
+    var series_data = {$series2_data};
+
+    var option;
+
+    option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: xAxis_data,
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
+        series: series_data
+    };
+
+    if (option && typeof option === 'object') {
+        myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+</script>

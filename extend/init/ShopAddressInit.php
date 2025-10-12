@@ -58,7 +58,7 @@ class ShopAddressInit extends Base
 
 
                 //公司名称
-                $item['company_name'] = $CompanyAddressModel->where('id', '=', $item['company_id'])->value('name');
+                $item['company_address'] = $CompanyAddressModel->where('id', '=', $item['company_id'])->value('address');
 
                 if ($params["is_export"]) {
                     //导出数据处理
@@ -137,7 +137,7 @@ class ShopAddressInit extends Base
         //公共处理数据
 
         //公司名称
-        $item['company_name'] = $CompanyAddressModel->where('id', '=', $item['company_id'])->value('name');
+        $item['company_address'] = $CompanyAddressModel->where('id', '=', $item['company_id'])->value('address');
 
         //处理数据
         $item['is_default_text'] = $this->is_default[$item['is_default']];//是否默认
