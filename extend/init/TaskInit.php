@@ -143,11 +143,10 @@ class TaskInit
         if ($print_time < date('H:i')) {
 
             $map   = [];
-            $map[] = ['date', '=', date('Y-m-d', strtotime("yesterday"))];
+            $map[] = ['date', '=', date('Y-m-d')];
             $map[] = ['status', 'in', [2, 8]];
             $map[] = ['is_print', '=', 2];
             $list  = $ShopOrderModel->where($map)->limit(20)->select();
-
 
             foreach ($list as $key => $order_info) {
                 //标签打印,小票打印

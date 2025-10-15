@@ -51,16 +51,39 @@
             <input class="form-control" name="goods_name" placeholder="请输入商品名称" style="width: 240px;"
                    type="text" value="{:input('goods_name/s','')}">
 
+            地址:
+            <div class="form-group">
+                <div class="layui-form-item">
+                    <div class="col-md-6 col-sm-10" style="display: flex;margin-top: 10px;width: 480px;">
+                        <select name="company_id" lay-search>
+                            <option value=""
+                            <if condition="$company_id eq '' ">selected</if>
+                            >暂不选择</option>
+
+                            <foreach name="address_list" key="key" item="vo">
+                                <option value="{$vo.id}"
+                                <if condition="$company_id eq $vo.id ">selected</if>
+                                > {$vo.name} ({$vo.address})</option>
+                            </foreach>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <br>
+
+
             下单时间:
             <input class="form-control" id="laydate-range-datetime" name="order_date" placeholder="请选择下单时间段"
                    style="width: 260px;"
                    type="text" value="{$order_date}">
 
-            <br>
-            <br>
+
             预定时间:
             <input class="form-control js-date" name="date" placeholder="请选择预定时间" style="width: 240px;"
-                   type="text" value="{:input('date/s','')}">
+                   type="text" value="{$date}">
 
 
             <button class="layui-btn" style="margin-left: 10px" type="submit">搜索</button>
@@ -77,293 +100,330 @@
         </div>
 
     </form>
-    <div class="layui-tab layui-tab-brief" lay-filter="LAY-order-tab">
-        <ul class="layui-tab-title order-tab">
-            <li
-            <if condition="!$status">class="layui-this"</if>
-            >
-            <a href="{:url('index',array('page'=>$page,'order_num'=>$order_num,'goods_name'=>$goods_name,'order_date'=>$order_date))}"
-               style='text-decoration:none;color: inherit'>
-                全部
-                <span class="layui-badge layui-bg-orange">{$total}</span>
-            </a>
-            </li>
-            <foreach item="vo" key="key" name="count">
+
+
+    <form class="js-ajax-form" method="post" autocomplete="off">
+
+        <br>
+        <div class="table-actions">
+
+            <button class="layui-btn layui-btn-primary layui-border-blue layui-btn-xs js-ajax-submit" type="submit"
+                    data-action="{:url('label_print_ids',['page'=>$page,'status'=>$status,'order_num'=>$order_num,'goods_name'=>$goods_name,'company_id'=>$company_id,'date'=>$date,'keyword'=>$keyword,'user_id'=>$user_id,'order_date'=>$order_date])}"
+                    data-subcheck="true" data-msg="你确定批量打印标签吗？">打印标签
+            </button>
+
+
+            <button class="layui-btn layui-btn-primary layui-border-red layui-btn-xs js-ajax-submit" type="submit"
+                    data-action="{:url('info_print_ids',['page'=>$page,'status'=>$status,'order_num'=>$order_num,'goods_name'=>$goods_name,'company_id'=>$company_id,'date'=>$date,'keyword'=>$keyword,'user_id'=>$user_id,'order_date'=>$order_date])}"
+                    data-subcheck="true" data-msg="你确定批量打印小票吗？">打印小票
+            </button>
+
+
+        </div>
+
+
+        <div class="layui-tab layui-tab-brief" lay-filter="LAY-order-tab">
+            <ul class="layui-tab-title order-tab">
                 <li
-                <if condition="$vo.key == $status">class="layui-this"</if>
+                <if condition="!$status">class="layui-this"</if>
                 >
-                <a href="{:url('index',array('page'=>$page,'status'=>$vo.key,'order_num'=>$order_num,'goods_name'=>$goods_name,'order_date'=>$order_date))}"
+                <a href="{:url('index',array('page'=>$page,'order_num'=>$order_num,'goods_name'=>$goods_name,'company_id'=>$company_id,'date'=>$date,'order_date'=>$order_date))}"
                    style='text-decoration:none;color: inherit'>
-                    {$vo.name}
-                    <span class="layui-badge layui-bg-orange">{$vo.count}</span>
+                    全部
+                    <span class="layui-badge layui-bg-orange">{$total}</span>
                 </a>
                 </li>
-            </foreach>
-        </ul>
-        <div class="layui-tab-content table-responsive">
-            <table class="table order-table">
-                <thead>
-                <tr class="tab-header">
-                    <th width="60%">
-                        <table class="th-table">
-                            <tr>
-                                <th width="5%">ID</th>
-                                <th width="60%">商品信息</th>
-                                <th width="10%">单价</th>
-                                <th width="10%">数量</th>
-                            </tr>
-                        </table>
-                    </th>
-                    <th width="10%">金额</th>
-                    <th width="10%">状态</th>
-                    <th width="10%">操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr class="tr-pipe"></tr>
-                </tbody>
-
-                <foreach item="vo" name="list">
+                <foreach item="vo" key="key" name="count">
+                    <li
+                    <if condition="$vo.key == $status">class="layui-this"</if>
+                    >
+                    <a href="{:url('index',array('page'=>$page,'status'=>$vo.key,'order_num'=>$order_num,'goods_name'=>$goods_name,'company_id'=>$company_id,'date'=>$date,'keyword'=>$keyword,'user_id'=>$user_id,'order_date'=>$order_date))}"
+                       style='text-decoration:none;color: inherit'>
+                        {$vo.name}
+                        <span class="layui-badge layui-bg-orange">{$vo.count}</span>
+                    </a>
+                    </li>
+                </foreach>
+            </ul>
+            <div class="layui-tab-content table-responsive">
+                <table class="table order-table">
+                    <thead>
+                    <tr class="tab-header">
+                        <th width="60%">
+                            <table class="th-table">
+                                <tr>
+                                    <th width="4%">
+                                        <input style="transform: scale(1.5);" type="checkbox" class="js-check-all"
+                                               data-direction="x"
+                                               data-checklist="js-check-x">
+                                    </th>
+                                    <th width="3%">ID</th>
+                                    <th width="60%">商品信息</th>
+                                    <th width="10%">单价</th>
+                                    <th width="10%">数量</th>
+                                </tr>
+                            </table>
+                        </th>
+                        <th width="10%">金额</th>
+                        <th width="10%">状态</th>
+                        <th width="10%">操作</th>
+                    </tr>
+                    </thead>
                     <tbody>
-                    <tr class="tr-header">
-                        <td colspan="5">
-                            <span>(ID:{$vo.id})</span>
-                            <!--                            <span style="margin-left:1%;"><b>{$vo.create_time|date="Y-m-d H:i"}</b></span>-->
-                            <span data-toggle="tooltip" title="点击复制订单号" onclick="copyContent('{$vo.order_num}')"
-                                  style="margin-left: 1%;">
+                    <tr class="tr-pipe"></tr>
+                    </tbody>
+
+                    <foreach item="vo" name="list">
+                        <tbody>
+                        <tr class="tr-header">
+                            <td colspan="5">
+                                <input type="checkbox" class="js-check" data-yid="js-check-y" data-xid="js-check-x"
+                                       name="ids[]"
+                                       style="transform: scale(1.5);" value="{$vo.id}">
+
+                                <span style="margin-left: 15px;">(ID:{$vo.id})</span>
+                                <!--                            <span style="margin-left:1%;"><b>{$vo.create_time|date="Y-m-d H:i"}</b></span>-->
+                                <span data-toggle="tooltip" title="点击复制订单号" onclick="copyContent('{$vo.order_num}')"
+                                      style="margin-left: 1%;">
                                 <cite>订单号：</cite>{$vo.order_num}
                             </span>
 
-                            <if condition="!empty($vo.pay_time)">
+                                <if condition="!empty($vo.pay_time)">
                                  <span data-toggle="tooltip" title="点击复制支付单号" onclick="copyContent('{$vo.pay_num}')"
                                        style="margin-left: 1%;">
                                     <cite>支付单号：</cite>{$vo.pay_num}
                                 </span>
-                            </if>
+                                </if>
 
-                            <span style="margin-left: 1%;">
+                                <span style="margin-left: 1%;">
                                  <cite>用户:</cite>
                                  <a href="javascript:imagePreviewDialog('{:cmf_get_image_preview_url($vo.user_info.avatar)}');">
                                     <img class="img-rounded" src="{$vo.user_info.avatar}"
                                          width="25">
                                 </a>
                             </span>
-                            <span ondblclick="copyContent('{$vo.user_info.openid}')">
+                                <span ondblclick="copyContent('{$vo.user_info.openid}')">
                                 (ID:{$vo.user_id}) {$vo.user_info.nickname}
                             </span>
-                            <if condition="!empty($vo.remark)">
-                                <i class="layui-icon layui-icon-reply-fill cursor" data-toggle="tooltip"
-                                   style="color: #FF5722"
-                                   title="{$vo.remark|default=''}"></i>
-                            </if>
+                                <if condition="!empty($vo.remark)">
+                                    <i class="layui-icon layui-icon-reply-fill cursor" data-toggle="tooltip"
+                                       style="color: #FF5722"
+                                       title="{$vo.remark|default=''}"></i>
+                                </if>
 
 
-                        </td>
-                    </tr>
-                    <tr class="tr-goods">
-                        <td>
-                            <table class="goods-item">
-                                <foreach item="goods" key="key" name="$vo.goods_list">
-                                    <tr>
-                                        <!--<td width="5%" class="text-center">{$vo.id}</td>-->
-                                        <!--id隐藏了,这里为60%-->
-                                        <td width="60%">
-                                            <div style="display: flex;">
-                                                <if condition="$goods.goods_id">
-                                                    <if condition="$goods.image">
-                                                        <div class="img">
-                                                            <a href="javascript:imagePreviewDialog('{:cmf_get_image_preview_url($goods.image)}');">
-                                                                <img alt=""
-                                                                     class="img-rounded" height="70"
-                                                                     src="{:cmf_get_image_preview_url($goods.image)}"
-                                                                     width="70">
-                                                            </a>
+                            </td>
+                        </tr>
+                        <tr class="tr-goods">
+                            <td>
+                                <table class="goods-item">
+                                    <foreach item="goods" key="key" name="$vo.goods_list">
+                                        <tr>
+                                            <!--<td width="5%" class="text-center">{$vo.id}</td>-->
+                                            <!--id隐藏了,这里为60%-->
+                                            <td width="60%">
+                                                <div style="display: flex;">
+                                                    <if condition="$goods.goods_id">
+                                                        <if condition="$goods.image">
+                                                            <div class="img">
+                                                                <a href="javascript:imagePreviewDialog('{:cmf_get_image_preview_url($goods.image)}');">
+                                                                    <img alt=""
+                                                                         class="img-rounded" height="70"
+                                                                         src="{:cmf_get_image_preview_url($goods.image)}"
+                                                                         width="70">
+                                                                </a>
+                                                            </div>
+                                                        </if>
+                                                        <div style="width: 120px;">
+                                                            <div class="title">
+                                                                <a href="{:url('index',array('page'=>$page,'type'=>$type,'order_num'=>$order_num,'goods_name'=>$goods.goods_name,'order_date'=>$order_date))}">
+                                                                    {$goods.goods_name}
+                                                                </a>
+                                                            </div>
+                                                            <if condition="$goods.sku_name">
+                                                                <span class="tags">{$goods.sku_name}</span>
+                                                            </if>
+
                                                         </div>
                                                     </if>
-                                                    <div style="width: 120px;">
-                                                        <div class="title">
-                                                            <a href="{:url('index',array('page'=>$page,'type'=>$type,'order_num'=>$order_num,'goods_name'=>$goods.goods_name,'order_date'=>$order_date))}">
-                                                                {$goods.goods_name}
-                                                            </a>
-                                                        </div>
-                                                        <if condition="$goods.sku_name">
-                                                            <span class="tags">{$goods.sku_name}</span>
-                                                        </if>
+                                                </div>
+                                            </td>
+                                            <td class="text-center" width="10%">&yen; {$goods.goods_price}</td>
+                                            <td class="text-center" width="10%">{$goods.count}</td>
+                                        </tr>
+                                    </foreach>
+                                </table>
+                            </td>
 
-                                                    </div>
-                                                </if>
-                                            </div>
-                                        </td>
-                                        <td class="text-center" width="10%">&yen; {$goods.goods_price}</td>
-                                        <td class="text-center" width="10%">{$goods.count}</td>
-                                    </tr>
-                                </foreach>
-                            </table>
-                        </td>
-
-                        <td class="text-center">
-                            &yen; {$vo.amount}
-                            <if condition="10 < $vo.status">
-                                <a data-toggle="tooltip"
-                                   href="javascript:openIframeLayer('{:url('reason',['id'=>$vo.id])}','查看退款原因',{area: ['800px', '460px']})"
-                                   style="margin-left: 5px"
-                                   title="退款原因">
-                                    <i class="layui-icon layui-icon-question layui-font-22 layui-font-red"></i>
-                                </a>
-                            </if>
-                        </td>
+                            <td class="text-center">
+                                &yen; {$vo.amount}
+                                <if condition="10 < $vo.status">
+                                    <a data-toggle="tooltip"
+                                       href="javascript:openIframeLayer('{:url('reason',['id'=>$vo.id])}','查看退款原因',{area: ['800px', '460px']})"
+                                       style="margin-left: 5px"
+                                       title="退款原因">
+                                        <i class="layui-icon layui-icon-question layui-font-22 layui-font-red"></i>
+                                    </a>
+                                </if>
+                            </td>
 
 
-                        <td class="text-center">
-                            <div class="status">
+                            <td class="text-center">
+                                <div class="status">
                                 <span class="layui-btn-xs layui-btn layui-btn-primary layui-border-orange{$vo.status_color}">
                                     {$vo.status_name}
                                 </span>
 
-                            </div>
-                        </td>
+                                </div>
+                            </td>
 
-                        <td class="text-center">
-                            <div class="operate">
-
-
-                                <if condition="$vo.status==12">
-                                    <a class="layui-bg-gray-light layui-circle op-btn"
-                                       data-id="{$vo.id}"
-                                       data-toggle="tooltip"
-                                       lay-on="pass-reject"
-                                       title="确认退款？">
-                                        <i class="layui-icon layui-icon-face-smile"></i>
-                                    </a>
+                            <td class="text-center">
+                                <div class="operate">
 
 
-                                    <!--无拒绝理由-->
-                                    <a class="layui-bg-gray-light layui-circle op-btn"
-                                       data-id="{$vo.id}"
-                                       data-toggle="tooltip"
-                                       lay-on="refund-reject"
-                                       title="拒绝退款？">
-                                        <i class="layui-icon layui-icon-face-cry"></i>
-                                    </a>
+                                    <if condition="$vo.status==12">
+                                        <a class="layui-bg-gray-light layui-circle op-btn"
+                                           data-id="{$vo.id}"
+                                           data-toggle="tooltip"
+                                           lay-on="pass-reject"
+                                           title="确认退款？">
+                                            <i class="layui-icon layui-icon-face-smile"></i>
+                                        </a>
 
 
-                                </if>
+                                        <!--无拒绝理由-->
+                                        <a class="layui-bg-gray-light layui-circle op-btn"
+                                           data-id="{$vo.id}"
+                                           data-toggle="tooltip"
+                                           lay-on="refund-reject"
+                                           title="拒绝退款？">
+                                            <i class="layui-icon layui-icon-face-cry"></i>
+                                        </a>
 
 
-                                <a class="layui-bg-gray-light layui-circle op-btn"
-                                   data-toggle="tooltip"
-                                   href="javascript:parent.openIframeLayer('{:url('details',['id'=>$vo.id])}','订单详情',{area: ['80%', '80%']})"
-                                   title="订单详情">
-                                    <i class="layui-icon layui-icon-more"></i>
-                                </a>
-
-
-                                <if condition="in_array($vo.status,[2,8])">
-                                    <a class="layui-bg-gray-light layui-circle op-btn"
-                                       data-id="{$vo.id}"
-                                       data-toggle="tooltip"
-                                       lay-on="label_print"
-                                       title="确认打印标签？">
-                                        <i class="layui-icon layui-icon-component"></i>
-                                    </a>
+                                    </if>
 
 
                                     <a class="layui-bg-gray-light layui-circle op-btn"
-                                       data-id="{$vo.id}"
                                        data-toggle="tooltip"
-                                       lay-on="info_print"
-                                       title="确认打印小票？">
-                                        <i class="layui-icon layui-icon-print"></i>
+                                       href="javascript:parent.openIframeLayer('{:url('details',['id'=>$vo.id])}','订单详情',{area: ['80%', '80%']})"
+                                       title="订单详情">
+                                        <i class="layui-icon layui-icon-more"></i>
                                     </a>
-                                </if>
 
 
-                            </div>
-                        </td>
-
-                    </tr>
-
-
-                    <tr class="tr-footer">
-                        <td colspan="5">
-                            <div style="display: flex;justify-content: space-between;width: 100%;align-items: center;">
-                                <div>
-                                    <div style="display:flex;">
-                                        <div style="width: 90px"><cite>联系人：</cite></div>
-                                        <div>{$vo.username}</div>
-                                    </div>
-                                    <div style="display:flex;">
-                                        <div style="width: 90px"><cite>电话：</cite></div>
-                                        <div>{$vo.phone}</div>
-                                    </div>
-                                    <div style="display:flex;">
-                                        <div style="width: 90px"><cite>地址：</cite></div>
-                                        <div>
-                                            {$vo.address}
-                                        </div>
-                                    </div>
-                                    <div style="display:flex;">
-                                        <div style="width: 90px"><cite>编号：</cite></div>
-                                        <div>
-                                            <if condition="$vo.number">
-                                                #{$vo.number}
-                                            </if>
-                                        </div>
-                                    </div>
-                                    <div style="display:flex;">
-                                        <div style="width: 90px"><cite>配送时间：</cite></div>
-                                        <div>
-                                            {$vo.delivery_time}
-                                        </div>
-                                    </div>
-                                    <div style="display:flex;">
-                                        <div style="width: 90px"><cite>预定时间：</cite></div>
-                                        <div>
-                                            {$vo.date} ( {$vo.week_name})
-                                        </div>
-                                    </div>
+                                    <if condition="in_array($vo.status,[2,8])">
+                                        <a class="layui-bg-gray-light layui-circle op-btn"
+                                           data-id="{$vo.id}"
+                                           data-toggle="tooltip"
+                                           lay-on="label_print"
+                                           title="确认打印标签？">
+                                            <i class="layui-icon layui-icon-component"></i>
+                                        </a>
 
 
-                                    <notempty name="$vo.admin_remark">
+                                        <a class="layui-bg-gray-light layui-circle op-btn"
+                                           data-id="{$vo.id}"
+                                           data-toggle="tooltip"
+                                           lay-on="info_print"
+                                           title="确认打印小票？">
+                                            <i class="layui-icon layui-icon-print"></i>
+                                        </a>
+                                    </if>
+
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+
+                        <tr class="tr-footer">
+                            <td colspan="5">
+                                <div style="display: flex;justify-content: space-between;width: 100%;align-items: center;">
+                                    <div>
                                         <div style="display:flex;">
-                                            <div style="width: 90px"><cite>管理员备注：</cite></div>
-                                            <div class="layui-font-orange">{$vo.admin_remark}</div>
+                                            <div style="width: 90px"><cite>联系人：</cite></div>
+                                            <div>{$vo.username}</div>
                                         </div>
-                                    </notempty>
-                                </div>
+                                        <div style="display:flex;">
+                                            <div style="width: 90px"><cite>电话：</cite></div>
+                                            <div>{$vo.phone}</div>
+                                        </div>
+                                        <div style="display:flex;">
+                                            <div style="width: 90px"><cite>地址：</cite></div>
+                                            <div>
+                                                {$vo.address}
+                                            </div>
+                                        </div>
+                                        <div style="display:flex;">
+                                            <div style="width: 90px"><cite>编号：</cite></div>
+                                            <div>
+                                                <if condition="$vo.number">
+                                                    #{$vo.number}
+                                                </if>
+                                            </div>
+                                        </div>
+                                        <div style="display:flex;">
+                                            <div style="width: 90px"><cite>配送时间：</cite></div>
+                                            <div>
+                                                {$vo.delivery_time}
+                                            </div>
+                                        </div>
+                                        <div style="display:flex;">
+                                            <div style="width: 90px"><cite>预定时间：</cite></div>
+                                            <div>
+                                                {$vo.date} ( {$vo.week_name})
+                                            </div>
+                                        </div>
 
-                                <div>
-                                    <div style="display:flex;text-align: right;">
-                                        <div style="width: 120px"><cite>下单时间：</cite></div>
-                                        <div>{$vo.create_time|date='Y-m-d H:i:s'}</div>
+
+                                        <notempty name="$vo.admin_remark">
+                                            <div style="display:flex;">
+                                                <div style="width: 90px"><cite>管理员备注：</cite></div>
+                                                <div class="layui-font-orange">{$vo.admin_remark}</div>
+                                            </div>
+                                        </notempty>
                                     </div>
-                                    <notempty name="$vo.pay_time">
+
+                                    <div>
                                         <div style="display:flex;text-align: right;">
-                                            <div style="width: 120px"><cite>支付时间：</cite></div>
-                                            <div>{$vo.pay_time|date='Y-m-d H:i:s'}</div>
+                                            <div style="width: 120px"><cite>下单时间：</cite></div>
+                                            <div>{$vo.create_time|date='Y-m-d H:i:s'}</div>
                                         </div>
-                                    </notempty>
+                                        <notempty name="$vo.pay_time">
+                                            <div style="display:flex;text-align: right;">
+                                                <div style="width: 120px"><cite>支付时间：</cite></div>
+                                                <div>{$vo.pay_time|date='Y-m-d H:i:s'}</div>
+                                            </div>
+                                        </notempty>
 
-                                    <notempty name="$vo.accomplish_time">
-                                        <div style="display:flex; text-align: right;">
-                                            <div style="width: 120px"><cite>完成时间：</cite></div>
-                                            <div>{$vo.accomplish_time|date='Y-m-d H:i:s'}</div>
-                                        </div>
-                                    </notempty>
+                                        <notempty name="$vo.accomplish_time">
+                                            <div style="display:flex; text-align: right;">
+                                                <div style="width: 120px"><cite>完成时间：</cite></div>
+                                                <div>{$vo.accomplish_time|date='Y-m-d H:i:s'}</div>
+                                            </div>
+                                        </notempty>
+                                    </div>
+
                                 </div>
-
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
 
 
-                    <tr class="tr-pipe"></tr>
-                    </tbody>
-                </foreach>
-            </table>
+                        <tr class="tr-pipe"></tr>
+                        </tbody>
+                    </foreach>
+                </table>
+            </div>
         </div>
-    </div>
+
+
+    </form>
+
     <div class="pagination">{$pagination|default=''}</div>
+
+
 </div>
 </body>
 </html>

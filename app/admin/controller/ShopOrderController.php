@@ -67,9 +67,10 @@ class ShopOrderController extends AdminBaseController
      */
     public function index()
     {
-        $params         = $this->request->param();
-        $ShopOrderInit  = new \init\ShopOrderInit();//订单管理
-        $ShopOrderModel = new \initmodel\ShopOrderModel();//订单管理
+        $params             = $this->request->param();
+        $ShopOrderInit      = new \init\ShopOrderInit();//订单管理
+        $ShopOrderModel     = new \initmodel\ShopOrderModel();//订单管理
+        $CompanyAddressInit = new \init\CompanyAddressInit();//地址管理    (ps:InitController)
 
 
         $where = [];
@@ -78,6 +79,7 @@ class ShopOrderController extends AdminBaseController
         if ($params['goods_name']) $where[] = ['goods_name', 'like', "%{$params['goods_name']}%"];
         if ($params['date']) $where[] = ['date', '=', $params['date']];
         if ($params['user_id']) $where[] = ['user_id', '=', $params['user_id']];
+        if ($params['company_id']) $where[] = ['company_id', '=', $params['company_id']];
 
 
         if ($params['order_date']) {
@@ -126,6 +128,9 @@ class ShopOrderController extends AdminBaseController
 
         $this->assign('count', $count);
 
+
+        //地址列表
+        $this->assign('address_list', $CompanyAddressInit->get_list());
 
         return $this->fetch();
     }
@@ -219,6 +224,73 @@ class ShopOrderController extends AdminBaseController
 
         //报错
         if ($result['code'] == 0) $this->error($result['msg']);
+
+
+        $this->success('打印成功');
+    }
+
+
+    //标签打印
+    public function label_print_ids()
+    {
+        $ShopOrderModel = new \initmodel\ShopOrderModel(); //订单管理  (ps:InitModel)
+        $InitController = new InitController();//基础类
+
+        /** 获取参数 **/
+        $params = $this->request->param();
+
+        /** 查询条件 **/
+        $where   = [];
+        $where[] = ["id", "in", $params["ids"]];
+
+        //订单信息
+        $order_list = $ShopOrderModel->where($where)->select();
+        if (empty($order_list)) $this->error("暂无数据");
+
+        foreach ($order_list as $order_info) {
+            //封装打印方法
+            $result = $InitController->labelPrint($order_info['order_num']);
+
+            //报错
+            if ($result['code'] == 0) $this->error($result['msg']);
+        }
+
+
+        $this->success('打印成功');
+    }
+
+
+    //小票打印
+    public function info_print_ids()
+    {
+        $ShopOrderModel = new \initmodel\ShopOrderModel(); //订单管理  (ps:InitModel)
+        $InitController = new InitController();//基础类
+
+
+        /** 获取参数 **/
+        $params = $this->request->param();
+
+        /** 查询条件 **/
+        $where   = [];
+        $where[] = ["id", "in", $params["ids"]];
+
+
+        /** 查询条件 **/
+        $where   = [];
+        $where[] = ["id", "in", $params["ids"]];
+
+        //订单信息
+        $order_list = $ShopOrderModel->where($where)->select();
+        if (empty($order_list)) $this->error("暂无数据");
+
+
+        foreach ($order_list as $order_info) {
+            //封装打印方法
+            $result = $InitController->infoPrint($order_info['order_num']);
+
+            //报错
+            if ($result['code'] == 0) $this->error($result['msg']);
+        }
 
 
         $this->success('打印成功');

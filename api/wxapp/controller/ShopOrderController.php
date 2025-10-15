@@ -637,6 +637,8 @@ class ShopOrderController extends AuthController
         if (empty($address_info)) $this->error('地址信息错误');
         $address = $CompanyAddressModel->where('id', '=', $address_info['company_id'])->value('address');
         if (empty($address)) $this->error('地址信息错误!');
+        $order_insert['company_id']  = $address_info['company_id'];
+        $order_insert['address_id']  = $address_info['id'];
         $order_insert['username']    = $address_info['username'];
         $order_insert['phone']       = $address_info['phone'];
         $order_insert['create_time'] = time();

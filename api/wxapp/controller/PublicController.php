@@ -112,6 +112,7 @@ class PublicController extends AuthController
 
         $map   = [];
         $map[] = ['status', '=', 2];
+        $map[] = ['id', '<', 39];
         Db::name('base_order_pay')->where($map)
             ->select()->each(function ($item, $key) use ($WxBaseController) {
                 $pay_num       = $item['pay_num'];
