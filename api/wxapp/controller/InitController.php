@@ -242,25 +242,45 @@ class InitController
             //地址名称自动换行处理（每行最多35个字符）
             $address = $this->wrapText($order_info['address'], 13, 35);
 
+            //备注
+            $remark = $this->wrapText($order_info['remark'], 13, 35);
+
             //再根据数量循环打印
             for ($j = 0; $j < $order_detail["count"]; $j++) {
-                $content = '<TEXT x="9" y="10" font="12" w="1" h="1" r="0">#' . $order_info['number'] . '         ' . '      ' . $i . '/' . $total_count . '</TEXT>';
+                if ($remark) {
+                    $content = '<TEXT x="9" y="7" font="12" w="1" h="1" r="0">#' . $order_info['number'] . '         ' . '      ' . $i . '/' . $total_count . '</TEXT>';
+                    // 商品名称 - 使用小字体并支持换行（保持原来位置）
+                    $content .= '<TEXT x="10" y="36" font="12" w="1" h="1" r="0">' . $goods_name . '</TEXT>';
+                    // 隔开
+                    $content .= '<TEXT x="10" y="52" font="12" w="1" h="1" r="0">--------------------------------------------</TEXT>';
+                    // 备注
+                    $content .= '<TEXT x="10" y="68" font="12" w="1" h="1" r="0">' . $remark . ' </TEXT>';
+                    // 隔开
+                    $content .= '<TEXT x="10" y="132" font="12" w="1" h="1" r="0">--------------------------------------------</TEXT>';
+                    // 地址信息
+                    $content .= '<TEXT x="10" y="144" font="12" w="1" h="1" r="0">' . $address . '</TEXT>';
 
-                // 商品名称 - 使用小字体并支持换行（保持原来位置）
-                $content .= '<TEXT x="10" y="40" font="12" w="1" h="1" r="0">' . $goods_name . '</TEXT>';
+                    // 用户信息 - 保持在最下面（原来位置）
+                    $content .= '<TEXT x="9" y="215" font="12" w="1" h="1" r="0">' . $this->LR($order_info['username'], $order_info['phone'], 26) . '</TEXT>';
+                } else {
+                    $content = '<TEXT x="9" y="10" font="12" w="1" h="1" r="0">#' . $order_info['number'] . '         ' . '      ' . $i . '/' . $total_count . '</TEXT>';
 
-                // 隔开
-                $content .= '<TEXT x="10" y="115" font="12" w="1" h="1" r="0">--------------------------------------------</TEXT>';
+                    // 商品名称 - 使用小字体并支持换行（保持原来位置）
+                    $content .= '<TEXT x="10" y="40" font="12" w="1" h="1" r="0">' . $goods_name . '</TEXT>';
 
-                // 地址信息
-                $content .= '<TEXT x="10" y="130" font="12" w="1" h="1" r="0">' . $address . '</TEXT>';
+                    // 隔开
+                    $content .= '<TEXT x="10" y="115" font="12" w="1" h="1" r="0">--------------------------------------------</TEXT>';
 
-                // 用户信息 - 保持在最下面（原来位置）
-                $content .= '<TEXT x="9" y="210" font="12" w="1" h="1" r="0">' . $this->LR($order_info['username'], $order_info['phone'], 26) . '</TEXT>';
+                    // 地址信息
+                    $content .= '<TEXT x="10" y="130" font="12" w="1" h="1" r="0">' . $address . '</TEXT>';
+
+                    // 用户信息 - 保持在最下面（原来位置）
+                    $content .= '<TEXT x="9" y="210" font="12" w="1" h="1" r="0">' . $this->LR($order_info['username'], $order_info['phone'], 26) . '</TEXT>';
+                }
+
 
                 $i += 1;
 
-                //dump($content);exit;
                 //这里打印标签 (正式打印)
                 $result = $FePrintPlugin->LabelPrint(cmf_config('label_sn'), $content);
                 if ($result['code'] == 0) {
