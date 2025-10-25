@@ -184,6 +184,7 @@ class InitController
         $content .= "配送时间：{$order_info['delivery_time']}<BR>";
         $content .= "预定时间：{$order_info['date']} ({$order_info['week_name']})<BR>";
 
+
         $result = $FePrintPlugin->InfoPrint(cmf_config('small_ticket_sn'), $content);
 
         if ($result['code'] == 0) {
@@ -214,13 +215,14 @@ class InitController
     {
         $FePrintPlugin = new  FePrintPlugin();
 
-        $content = "<CB>   {$date}  </CB><BR>";
+        $content = "<CB>{$date}(汇总)</CB><BR>";
         $content .= '名称　　　　　　　　　　　数量<BR>';
         $content .= $this->set_goods_address($goods_list);
         $content .= "配送时间：{$delivery_time}<BR>";
         $content .= "预定时间：{$date}<BR>";
         $content .= "送货地点：{$address}<BR>";
 
+//        dump($content);exit();
 
         $result = $FePrintPlugin->InfoPrint(cmf_config('small_ticket_sn'), $content);
 
@@ -272,7 +274,7 @@ class InitController
 
         foreach ($order_detail_list as $k => $order_detail) {
             $goods_name = $order_detail["goods_name"];
-            if ($order_detail['sku_name']) $goods_name .= ' SKU:[' . $order_detail['sku_name'] . ']';
+            if ($order_detail['sku_name']) $goods_name .= ' 规格:[' . $order_detail['sku_name'] . ']';
 
             // 商品名称自动换行处理（每行最多35个字符）
             $goods_name = $this->wrapText($goods_name, 13, 35);
@@ -409,8 +411,8 @@ class InitController
     {
         $orderInfo = '--------------------------------<BR>';
         foreach ($arr as $k5 => $v5) {
-            $name = $v5['goods_name'];
-            if ($v5['sku_name']) $name .= ' SKU:[' . $v5['sku_name'] . ']';
+            $name = $v5['goods_name'] . ';';
+            if ($v5['sku_name']) $name .= ' 规格:[' . $v5['sku_name'] . '];';
             $price    = $v5['goods_price'];
             $num      = $v5['count'];
             $prices   = round($v5['goods_price'] * $v5['count'], 2);
@@ -497,96 +499,91 @@ class InitController
 
 
     /**
-     * 设置商品信息样式 (地址)
+     * 设置商品信息样式（只显示名称和数量）
      * @param $arr 商品信息
-     * @param $nameWidth 名称宽度（字符数）
-     * @param $countWidth 数量宽度
+     * @param $A 名称列宽度
+     * @param $B 数量列宽度
      * @return string
      */
-    private function set_goods_address($arr, $nameWidth = 26, $countWidth = 8)
+    private function set_goods_address($arr, $A = 27, $B = 5)
     {
         $orderInfo = '--------------------------------<BR>';
-
         foreach ($arr as $v5) {
             $name = $v5['goods_name'];
-            if ($v5['sku_name']) $name .= ' SKU:[' . $v5['sku_name'] . ']';
+            if ($v5['sku_name']) {
+                $name .= ' 规格:[' . $v5['sku_name'] . ']';
+            }
+            $num = $v5['count'];
 
-            $count = $v5['count'];
+            $kw1 = '';
+            $kw2 = '';
+            $str = $name;
+            $blankNum = $A; // 名称控制宽度
+            $lan = mb_strlen($str, 'utf-8');
+            $m = 0;
+            $j = 1;
+            $blankNum++;
+            $result = array();
 
-            // 数量补空格处理
-            $countSpace = str_repeat(' ', max(0, $countWidth - strlen($count)));
-            $count = $count . $countSpace;
+            // 处理数量列格式
+            if (strlen($num) < $B) {
+                $k2 = $B - strlen($num);
+                for ($q = 0; $q < $k2; $q++) {
+                    $kw2 .= ' ';
+                }
+                $num = $num . $kw2;
+            }
 
-            // 优化后的名称处理逻辑
-            $lines = $this->splitProductName($name, $nameWidth, $countWidth);
-
-            // 拼接商品信息
-            foreach ($lines as $index => $line) {
-                if ($index === 0) {
-                    // 第一行显示名称和数量
-                    $lineWidth = mb_strwidth($line, 'utf-8');
-                    $spaceNum = $nameWidth - $lineWidth;
-                    $line .= str_repeat(' ', max(0, $spaceNum));
-                    $orderInfo .= $line . ' ' . $count . '<BR>';
-                } else {
-                    // 其他行只显示名称续行
-                    $orderInfo .= $line . '<BR>';
+            // 处理名称换行
+            for ($i = 0; $i < $lan; $i++) {
+                $new = mb_substr($str, $m, $j, 'utf-8');
+                $j++;
+                if (mb_strwidth($new, 'utf-8') < $blankNum) {
+                    if ($m + $j > $lan) {
+                        $m = $m + $j;
+                        $tail = $new;
+                        $lenght = iconv("UTF-8", "GBK//IGNORE", $new);
+                        $k = $A - strlen($lenght);
+                        for ($q = 0; $q < $k; $q++) {
+                            $kw1 .= ' ';
+                        }
+                        if ($m == $j) {
+                            $tail .= $kw1 . ' ' . $num;
+                        } else {
+                            $tail .= $kw1 . '<BR>';
+                        }
+                        break;
+                    } else {
+                        $next_new = mb_substr($str, $m, $j, 'utf-8');
+                        if (mb_strwidth($next_new, 'utf-8') < $blankNum) {
+                            continue;
+                        } else {
+                            $m = $i + 1;
+                            $result[] = $new;
+                            $j = 1;
+                        }
+                    }
                 }
             }
+
+            $head = '';
+            foreach ($result as $key => $value) {
+                if ($key < 1) {
+                    $v_lenght = iconv("UTF-8", "GBK//IGNORE", $value);
+                    $v_lenght = strlen($v_lenght);
+                    if ($v_lenght == $A - 1) {
+                        $value = $value . " ";
+                    }
+                    $head .= $value . ' ' . $num;
+                } else {
+                    $head .= $value . '<BR>';
+                }
+            }
+            $orderInfo .= $head . $tail;
         }
 
-        $orderInfo .= '--------------------------------<BR>';
+        $orderInfo .= '----------------------------<BR>';
         return $orderInfo;
     }
-
-    /**
-     * 智能分割商品名称
-     * @param string $name 商品名称
-     * @param int $nameWidth 名称最大宽度
-     * @param int $countWidth 数量宽度
-     * @return array
-     */
-    private function splitProductName($name, $nameWidth, $countWidth = 0)
-    {
-        $lines = [];
-        $currentLine = '';
-        $currentWidth = 0;
-
-        // 计算第一行可用的最大宽度（考虑数量信息占用的空间）
-        $firstLineMaxWidth = $nameWidth;
-
-        $length = mb_strlen($name, 'utf-8');
-
-        for ($i = 0; $i < $length; $i++) {
-            $char = mb_substr($name, $i, 1, 'utf-8');
-            $charWidth = mb_strwidth($char, 'utf-8');
-
-            // 如果当前字符加入后不会超过限制
-            if ($currentWidth + $charWidth <= $firstLineMaxWidth) {
-                $currentLine .= $char;
-                $currentWidth += $charWidth;
-            } else {
-                // 当前行已满，保存并开始新行
-                if (!empty($currentLine)) {
-                    $lines[] = $currentLine;
-                }
-
-                // 新行的最大宽度（续行可以更宽，因为不需要显示数量信息）
-                $nextLineMaxWidth = $nameWidth + 12; // 续行可以多显示12个字符宽度
-
-                $currentLine = $char;
-                $currentWidth = $charWidth;
-                $firstLineMaxWidth = $nextLineMaxWidth; // 后续行使用更大的宽度限制
-            }
-        }
-
-        // 添加最后一行
-        if (!empty($currentLine)) {
-            $lines[] = $currentLine;
-        }
-
-        return $lines;
-    }
-
 
 }
