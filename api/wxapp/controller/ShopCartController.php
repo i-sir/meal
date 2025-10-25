@@ -168,7 +168,7 @@ class ShopCartController extends AuthController
         $params['count']       = $params['count'] ?? 1;
         $params['create_time'] = time();
         $params['update_time'] = time();
-
+        $params['sku_id']      = $params['sku_id'] ?? 0;
 
         $where   = [];
         $where[] = ['goods_id', '=', $params['goods_id']];

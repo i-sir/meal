@@ -687,7 +687,7 @@ class ShopOrderController extends AuthController
                 $order_detail[$key]['goods_name']   = $goods_info['goods_name'];
                 $order_detail[$key]['shop_id']      = $params['shop_id'] ?? $goods_info['shop_id'];
                 $order_detail[$key]['goods_id']     = $cart['goods_id'];
-                $order_detail[$key]['sku_id']       = $cart['sku_id'];
+                $order_detail[$key]['sku_id']       = $cart['sku_id'] ?? 0;
                 $order_detail[$key]['sku_name']     = $cart['sku_name'];
                 $order_detail[$key]['count']        = $cart['count'];
                 $order_detail[$key]['goods_price']  = $sku_info['price'];//单价
@@ -697,6 +697,8 @@ class ShopOrderController extends AuthController
                 $order_detail[$key]['order_num']    = $order_num;
                 $order_detail[$key]['create_time']  = time();
                 $order_detail[$key]['image']        = cmf_get_asset_url($goods_info['image']);
+                $order_detail[$key]['week']         = $order_insert['week'];
+                $order_detail[$key]['date']         = $order_insert['date'];
 
                 //商品金额
                 $goods_amount += round($sku_info['price'] * $cart['count'], 2);
@@ -747,7 +749,7 @@ class ShopOrderController extends AuthController
             $order_detail['user_id']      = $this->user_id;
             $order_detail['goods_id']     = $sku_info['goods_id'];
             $order_detail['goods_name']   = $sku_info['name'];
-            $order_detail['sku_id']       = $params['sku_id'];
+            $order_detail['sku_id']       = $params['sku_id'] ?? 0;
             $order_detail['sku_name']     = $params['sku_name'];
             $order_detail['count']        = $count;
             $order_detail['goods_price']  = $sku_info['price'];//单价

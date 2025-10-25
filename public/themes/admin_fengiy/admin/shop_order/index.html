@@ -35,7 +35,7 @@
     </ul>
 
     <form action="{:url('index')}" autocomplete="off"
-          class="well form-inline margin-top-20 layui-form ajax-form w-form-search"
+          class="well form-inline margin-top-20 layui-form ajax-form w-form-search js-ajax-form"
           method="get">
         <div>
             关键字:
@@ -71,9 +71,29 @@
                 </div>
             </div>
 
-            <br>
-            <br>
 
+
+            <br>
+            <br>
+            配送时间:
+            <div class="form-group">
+                <div class="layui-form-item">
+                    <div class="col-md-6 col-sm-10" style="margin-top: 10px;width: 200px;">
+                        <select name="delivery_time" lay-search>
+                            <option value=""
+                            <if condition="$delivery_time eq '' ">selected</if>
+                            >暂不选择</option>
+
+                            <foreach name="delivery_time_list" key="key" item="vo">
+                                <option value="{$vo}"
+                                <if condition="$delivery_time eq $vo">selected</if>
+                                > {$vo}</option>
+                            </foreach>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             下单时间:
             <input class="form-control" id="laydate-range-datetime" name="order_date" placeholder="请选择下单时间段"
@@ -91,7 +111,20 @@
             <a class="layui-btn layui-bg-red" href="{:url('index',array('params'=>$params))}">清空</a>
 
 
+            <!-- 优化后的批量打印小票按钮 -->
+
+
+            <if condition="$date  &&  $company_id && $delivery_time">
+                <button class="layui-btn layui-bg-blue js-ajax-submit" type="submit"
+                        data-action="{:url('info_print_address',['company_id'=>$company_id,'date'=>$date,'order_date'=>$order_date])}"
+                >打印小票
+                </button>
+            </if>
+
+
             <input class="is_export" name="is_export" type="hidden" value="0">
+
+
             <input name="page" type="hidden" value="{$page}">
             <input class="form-control" name="status" style="width: 200px;" type="hidden"
                    value="{:input('status/s','')}">
@@ -437,6 +470,14 @@
         $(".is_export").val(1);
         $(".ajax-form").submit();
         $(".is_export").val(0);
+        return false;
+    });
+    //导出
+    $(".ajax_info_print_address").click(function () {
+        //alert("正在开发中...");
+        $(".info_print_address").val(1);
+        $(".ajax-form").submit();
+        $(".info_print_address").val(0);
         return false;
     });
 

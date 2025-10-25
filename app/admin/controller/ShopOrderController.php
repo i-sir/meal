@@ -77,6 +77,7 @@ class ShopOrderController extends AdminBaseController
         if ($params['keyword']) $where[] = ['phone|username|order_num', 'like', "%{$params['keyword']}%"];
         if ($params['order_num']) $where[] = ['order_num', 'like', "%{$params['order_num']}%"];
         if ($params['goods_name']) $where[] = ['goods_name', 'like', "%{$params['goods_name']}%"];
+        if ($params['delivery_time']) $where[] = ['delivery_time', '=', $params['delivery_time']];
         if ($params['date']) $where[] = ['date', '=', $params['date']];
         if ($params['user_id']) $where[] = ['user_id', '=', $params['user_id']];
         if ($params['company_id']) $where[] = ['company_id', '=', $params['company_id']];
@@ -131,6 +132,11 @@ class ShopOrderController extends AdminBaseController
 
         //地址列表
         $this->assign('address_list', $CompanyAddressInit->get_list());
+
+
+        //配送时间
+        $this->assign('delivery_time_list', $this->getParams(cmf_config('delivery_time_period'), '/'));
+
 
         return $this->fetch();
     }
@@ -263,6 +269,7 @@ class ShopOrderController extends AdminBaseController
     //小票打印
     public function info_print_ids()
     {
+
         $ShopOrderModel = new \initmodel\ShopOrderModel(); //订单管理  (ps:InitModel)
         $InitController = new InitController();//基础类
 
@@ -291,6 +298,60 @@ class ShopOrderController extends AdminBaseController
             //报错
             if ($result['code'] == 0) $this->error($result['msg']);
         }
+
+
+        $this->success('打印成功');
+    }
+
+
+    //根据地址打印小票
+    public function info_print_address()
+    {
+        $ShopOrderModel       = new \initmodel\ShopOrderModel();//订单管理
+        $ShopOrderDetailModel = new \initmodel\ShopOrderDetailModel();//订单详情  (ps:InitModel)
+        $InitController       = new InitController();//基础类
+        $CompanyAddressModel  = new \initmodel\CompanyAddressModel(); //地址管理  (ps:InitModel)
+
+
+        $params = $this->request->param();
+
+
+        $where = [];
+        if ($params['date']) $where[] = ['date', '=', $params['date']];
+        if ($params['delivery_time']) $where[] = ['delivery_time', '=', $params['delivery_time']];
+        if ($params['company_id']) $where[] = ['company_id', '=', $params['company_id']];
+        if ($params['order_date']) {
+            $order_date_arr = explode(' - ', $params['order_date']);
+            $where[]        = $this->getBetweenTime($order_date_arr[0], $order_date_arr[1]);
+        }
+
+
+        //查询出订单号
+        $map100     = [];
+        $map100[]   = ['status', 'in', [2, 8]];
+        $order_nums = $ShopOrderModel->where(array_merge($map100, $where))->column('order_num');
+
+        //给商品id去重,算出商品数量
+        $map        = [];
+        $map[]      = ['order_num', 'in', $order_nums];
+        $goods_list = $ShopOrderDetailModel->where($map)
+            ->field('goods_id, sku_id, SUM(count) as total_count,goods_name,sku_name,count')
+            ->group('goods_id, sku_id')
+            ->select();
+
+        if (empty(count($goods_list))) $this->error("暂无数据");
+
+
+        //地址名称
+        $address_info = $CompanyAddressModel->where('id', '=', $params['company_id'])->find();//地址名称
+        $address      = "{$address_info['name']} ({$address_info['address']})";//地址名称
+
+
+        //封装打印方法
+        $result = $InitController->infoPrintAddress($params['date'], $address, $params['delivery_time'], $goods_list);
+
+        //报错
+        if ($result['code'] == 0) $this->error($result['msg']);
 
 
         $this->success('打印成功');

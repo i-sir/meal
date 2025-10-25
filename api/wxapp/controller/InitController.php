@@ -200,6 +200,44 @@ class InitController
 
 
     /**
+     * 打印小票 分地址打印
+     * @param $date             日期
+     * @param $address          地址
+     * @param $delivery_time    配送时间
+     * @param $goods_list       商品列表
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function infoPrintAddress($date = '', $address = '', $delivery_time = '', $goods_list = [])
+    {
+        $FePrintPlugin = new  FePrintPlugin();
+
+        $content = "<CB>   {$date}  </CB><BR>";
+        $content .= '名称　　　　　　　　　　　数量<BR>';
+        $content .= $this->set_goods_address($goods_list);
+        $content .= "配送时间：{$delivery_time}<BR>";
+        $content .= "预定时间：{$date}<BR>";
+        $content .= "送货地点：{$address}<BR>";
+
+
+        $result = $FePrintPlugin->InfoPrint(cmf_config('small_ticket_sn'), $content);
+
+        if ($result['code'] == 0) {
+            Log::write("(小票)打印小票出错(分地址打印):    时间:" . date('Y-m-d H:i:s') . "  参数如下:");
+            Log::write($content);
+            Log::write("(小票)打印机报错(分地址打印)信息如下:");
+            Log::write($result);
+            return ['code' => 0, 'msg' => $result['msg'], 'data' => $result];
+        }
+
+
+        return ['code' => 1, 'msg' => '打印成功', 'data' => null];
+    }
+
+
+    /**
      * 打印标签
      * @param $order_num
      * @return array
@@ -455,6 +493,99 @@ class InitController
         $orderInfo .= '--------------------------------<BR>';
 
         return $orderInfo;
+    }
+
+
+    /**
+     * 设置商品信息样式 (地址)
+     * @param $arr 商品信息
+     * @param $nameWidth 名称宽度（字符数）
+     * @param $countWidth 数量宽度
+     * @return string
+     */
+    private function set_goods_address($arr, $nameWidth = 26, $countWidth = 8)
+    {
+        $orderInfo = '--------------------------------<BR>';
+
+        foreach ($arr as $v5) {
+            $name = $v5['goods_name'];
+            if ($v5['sku_name']) $name .= ' SKU:[' . $v5['sku_name'] . ']';
+
+            $count = $v5['count'];
+
+            // 数量补空格处理
+            $countSpace = str_repeat(' ', max(0, $countWidth - strlen($count)));
+            $count = $count . $countSpace;
+
+            // 优化后的名称处理逻辑
+            $lines = $this->splitProductName($name, $nameWidth, $countWidth);
+
+            // 拼接商品信息
+            foreach ($lines as $index => $line) {
+                if ($index === 0) {
+                    // 第一行显示名称和数量
+                    $lineWidth = mb_strwidth($line, 'utf-8');
+                    $spaceNum = $nameWidth - $lineWidth;
+                    $line .= str_repeat(' ', max(0, $spaceNum));
+                    $orderInfo .= $line . ' ' . $count . '<BR>';
+                } else {
+                    // 其他行只显示名称续行
+                    $orderInfo .= $line . '<BR>';
+                }
+            }
+        }
+
+        $orderInfo .= '--------------------------------<BR>';
+        return $orderInfo;
+    }
+
+    /**
+     * 智能分割商品名称
+     * @param string $name 商品名称
+     * @param int $nameWidth 名称最大宽度
+     * @param int $countWidth 数量宽度
+     * @return array
+     */
+    private function splitProductName($name, $nameWidth, $countWidth = 0)
+    {
+        $lines = [];
+        $currentLine = '';
+        $currentWidth = 0;
+
+        // 计算第一行可用的最大宽度（考虑数量信息占用的空间）
+        $firstLineMaxWidth = $nameWidth;
+
+        $length = mb_strlen($name, 'utf-8');
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = mb_substr($name, $i, 1, 'utf-8');
+            $charWidth = mb_strwidth($char, 'utf-8');
+
+            // 如果当前字符加入后不会超过限制
+            if ($currentWidth + $charWidth <= $firstLineMaxWidth) {
+                $currentLine .= $char;
+                $currentWidth += $charWidth;
+            } else {
+                // 当前行已满，保存并开始新行
+                if (!empty($currentLine)) {
+                    $lines[] = $currentLine;
+                }
+
+                // 新行的最大宽度（续行可以更宽，因为不需要显示数量信息）
+                $nextLineMaxWidth = $nameWidth + 12; // 续行可以多显示12个字符宽度
+
+                $currentLine = $char;
+                $currentWidth = $charWidth;
+                $firstLineMaxWidth = $nextLineMaxWidth; // 后续行使用更大的宽度限制
+            }
+        }
+
+        // 添加最后一行
+        if (!empty($currentLine)) {
+            $lines[] = $currentLine;
+        }
+
+        return $lines;
     }
 
 

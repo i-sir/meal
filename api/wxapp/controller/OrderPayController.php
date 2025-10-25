@@ -166,7 +166,7 @@ class OrderPayController extends AuthController
      * )
      *
      *   test_environment: http://meal.ikun:9090/api/wxapp/order_pay/free_pay
-     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/order_pay/free_pay
+     *   official_environment: http://xcxkf207.aubye.com/api/wxapp/order_pay/free_pay?order_num=2510251003375142&order_type=10
      *   api: /wxapp/order_pay/free_pay
      *   remark_name: 免费兑换
      *
